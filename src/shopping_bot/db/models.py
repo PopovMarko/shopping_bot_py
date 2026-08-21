@@ -1,10 +1,12 @@
 from __future__ import annotations
+from datetime import datetime
 
 
-from sqlalchemy import BigInteger, Enum, ForeignKey, String, Time
+from sqlalchemy import BigInteger, Enum, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 import enum
+from decimal import Decimal
 
 
 class Base(DeclarativeBase):
@@ -20,11 +22,11 @@ class RequestStatus(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
-    telegram_id: Mapped[BigInteger] = mapped_column(unique=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     name: Mapped[str] = mapped_column(String(50))
     shopping_status: Mapped[bool]
-    active_message_id: Mapped[BigInteger]
-    shopping_started_at: Mapped[Time]
+    active_message_id: Mapped[int] = mapped_column(BigInteger)
+    shopping_started_at: Mapped[datetime]
     purchases: Mapped[list[Purchase]] = relationship(back_populates="user")
     requests: Mapped[list[Request]] = relationship(back_populates="user")
 
@@ -33,7 +35,7 @@ class Product(Base):
     __tablename__ = "products"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
-    description: Mapped[str] = mapped_column(nullable=True)
+    description: Mapped[str | None]
     unit: Mapped[str]
 
 
@@ -49,12 +51,13 @@ class Request(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
     requested_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    requested_quantity: Mapped[float]
-    requested_at: Mapped[Time]
-    status: Mapped[str] = mapped_column(
+    requested_quantity: Mapped[Decimal]
+    requested_at: Mapped[datetime]
+    status: Mapped[RequestStatus] = mapped_column(
         Enum(RequestStatus, name="request_status_constraint"),
         default=RequestStatus.pending,
     )
+    user: Mapped[User] = relationship(back_populates="requests")
 
 
 class Receipt(Base):
@@ -62,10 +65,10 @@ class Receipt(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
     uploaded_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    receipt_date: Mapped[Time]
+    receipt_date: Mapped[datetime]
     image_url: Mapped[str | None]
     raw_model_response: Mapped[str | None]
-    created_at: Mapped[Time]
+    created_at: Mapped[datetime]
 
 
 class Purchase(Base):
@@ -75,8 +78,8 @@ class Purchase(Base):
     request_id: Mapped[int | None] = mapped_column(ForeignKey("requests.id"))
     receipt_id: Mapped[int | None] = mapped_column(ForeignKey("receipts.id"))
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
-    price: Mapped[float]
-    quantity: Mapped[float]
-    purchased_at: Mapped[Time]
-    match_confindent: Mapped[float]
+    price: Mapped[Decimal]
+    quantity: Mapped[Decimal]
+    purchased_at: Mapped[datetime]
+    match_confidence: Mapped[Decimal]
     user: Mapped[User] = relationship(back_populates="purchases")
