@@ -1,0 +1,27 @@
+[project]
+name = "shopping-bot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Mark Popov", email = "hawk691@gmail.com" }]
+requires-python = ">=3.14"
+dependencies = [
+    "aiogram>=3.30.0",
+    "asyncio>=4.0.0",
+    "dotenv>=0.9.9",
+    "sqlalchemy>=2.0.52",
+]
+
+[project.scripts]
+shopping-bot = "shopping_bot:main"
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
+[tool.ruff]
+line-length = 88
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
