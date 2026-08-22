@@ -1,12 +1,11 @@
 from __future__ import annotations
-from datetime import datetime
 
+import enum
+from datetime import datetime
+from decimal import Decimal
 
 from sqlalchemy import BigInteger, Enum, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-
-import enum
-from decimal import Decimal
 
 
 class Base(DeclarativeBase):
@@ -15,6 +14,7 @@ class Base(DeclarativeBase):
 
 class RequestStatus(str, enum.Enum):
     pending = "pending"
+    in_cart = "in_cart"
     fulfilled = "fulfilled"
     cancelled = "cancelled"
 
@@ -24,6 +24,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     name: Mapped[str] = mapped_column(String(50))
+    is_admin: Mapped[bool] = mapped_column(defauld=False)
     shopping_status: Mapped[bool]
     active_message_id: Mapped[int] = mapped_column(BigInteger)
     shopping_started_at: Mapped[datetime]
