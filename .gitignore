@@ -11,3 +11,6 @@ wheels/
 
 # dotenv environments variables
 .env
+
+#claude code
+.claude

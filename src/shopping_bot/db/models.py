@@ -27,7 +27,7 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(defauld=False)
     shopping_status: Mapped[bool]
     active_message_id: Mapped[int] = mapped_column(BigInteger)
-    shopping_started_at: Mapped[datetime]
+    shopping_started_at: Mapped[datetime | None]
     purchases: Mapped[list[Purchase]] = relationship(back_populates="user")
     requests: Mapped[list[Request]] = relationship(back_populates="user")
 

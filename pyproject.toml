@@ -9,6 +9,8 @@ dependencies = [
     "aiogram>=3.30.0",
     "asyncio>=4.0.0",
     "dotenv>=0.9.9",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
     "sqlalchemy>=2.0.52",
 ]
 
