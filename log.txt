@@ -1,0 +1,28 @@
+* b1d0f97 (HEAD -> dev, origin/dev) Handlers /start and /help ready, tests for /start passed
+*   cbdd404 (origin/main, origin/HEAD, main) Merge remote-tracking branch 'origin/handlers'
+|\  
+| *   6fa671d (origin/handlers) handlers branch
+| |\  
+* | \   218742e Merge branch 'db/models'
+|\ \ \  
+| |_|/  
+|/| |   
+| * | e0c92df (origin/db/models) Requests.status now have four options 'in_cart' added
+* | | 0cfe575 Merge pull request #2 from PopovMarko/db/models
+|\| | 
+| * | 92ea67a Models V1 fineshed
+| * | 3f9536e Init SQLAlchemi models for all tables added
+* | |   b976f1d Merge pull request #1 from PopovMarko/handlers
+|\ \ \  
+| |/ /  
+|/| |   
+| | | * 8db484c (refs/stash) WIP on handlers: e7a0f6f minor changes
+| | |/| 
+| | | * 5563bbb index on handlers: e7a0f6f minor changes
+| | |/  
+| | * e7a0f6f minor changes
+| |/  
+| * 50cc988 Init handlers for bot testing
+|/  
+* 72b98d4 (origin/infra, infra) Infrastructure added
+.cover

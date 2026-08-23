@@ -9,7 +9,7 @@ class UserRegistrationResult(Enum):
 
 @dataclass
 class RequestUserDomain:
-    user_id: int
+    telegram_id: int
     user_name: str
 
 

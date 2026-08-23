@@ -14,3 +14,4 @@ wheels/
 
 #claude code
 .claude
+.coverage
