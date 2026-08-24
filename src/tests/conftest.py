@@ -46,3 +46,12 @@ def mock_repository_factory():
         return repository
 
     return _make
+
+
+@pytest.fixture
+def mock_async_session_factory():
+    session = AsyncMock()
+    factory = MagicMock(return_value=session)
+    session.__aenter__.return_value = session
+    session.__aexit__.return_value = None
+    return factory, session

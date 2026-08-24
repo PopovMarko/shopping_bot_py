@@ -24,7 +24,7 @@ class UserModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     name: Mapped[str] = mapped_column(String(50))
-    is_admin: Mapped[bool] = mapped_column(defauld=False)
+    is_admin: Mapped[bool] = mapped_column(default=False)
     shopping_status: Mapped[bool]
     active_message_id: Mapped[int] = mapped_column(BigInteger)
     shopping_started_at: Mapped[datetime | None]
