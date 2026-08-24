@@ -19,7 +19,7 @@ class RequestStatus(str, enum.Enum):
     cancelled = "cancelled"
 
 
-class User(Base):
+class UserModel(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
@@ -28,11 +28,11 @@ class User(Base):
     shopping_status: Mapped[bool]
     active_message_id: Mapped[int] = mapped_column(BigInteger)
     shopping_started_at: Mapped[datetime | None]
-    purchases: Mapped[list[Purchase]] = relationship(back_populates="user")
-    requests: Mapped[list[Request]] = relationship(back_populates="user")
+    purchases: Mapped[list[PurchaseModel]] = relationship(back_populates="user")
+    requests: Mapped[list[RequestModel]] = relationship(back_populates="user")
 
 
-class Product(Base):
+class ProductModel(Base):
     __tablename__ = "products"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
@@ -40,14 +40,14 @@ class Product(Base):
     unit: Mapped[str]
 
 
-class Store(Base):
+class StoreModel(Base):
     __tablename__ = "stores"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     address: Mapped[str]
 
 
-class Request(Base):
+class RequestModel(Base):
     __tablename__ = "requests"
     id: Mapped[int] = mapped_column(primary_key=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
@@ -58,10 +58,10 @@ class Request(Base):
         Enum(RequestStatus, name="request_status_constraint"),
         default=RequestStatus.pending,
     )
-    user: Mapped[User] = relationship(back_populates="requests")
+    user: Mapped[UserModel] = relationship(back_populates="requests")
 
 
-class Receipt(Base):
+class ReceiptModel(Base):
     __tablename__ = "receipts"
     id: Mapped[int] = mapped_column(primary_key=True)
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
@@ -72,7 +72,7 @@ class Receipt(Base):
     created_at: Mapped[datetime]
 
 
-class Purchase(Base):
+class PurchaseModel(Base):
     __tablename__ = "purchases"
     id: Mapped[int] = mapped_column(primary_key=True)
     purchased_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
@@ -83,4 +83,4 @@ class Purchase(Base):
     quantity: Mapped[Decimal]
     purchased_at: Mapped[datetime]
     match_confidence: Mapped[Decimal]
-    user: Mapped[User] = relationship(back_populates="purchases")
+    user: Mapped[UserModel] = relationship(back_populates="purchases")

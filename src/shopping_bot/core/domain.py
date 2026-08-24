@@ -10,7 +10,8 @@ class UserRegistrationResult(Enum):
 @dataclass
 class RequestUserDomain:
     telegram_id: int
-    user_name: str
+    name: str
+    is_admin: bool = False
 
 
 @dataclass
