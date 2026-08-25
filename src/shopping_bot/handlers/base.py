@@ -23,6 +23,11 @@ async def start(message: Message, user_controller: UserController):
     await message.answer(user_domain_to_string(response))
 
 
-@router.message(Command("/help"))
+@router.message(Command("help"))
 async def help(message: Message):
     await message.answer(HELP_MESSAGE)
+
+
+@router.message(Command("добавить"))
+async def add_product(message: Message):
+    await message.answer("answer")

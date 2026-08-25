@@ -4,7 +4,7 @@ import enum
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import BigInteger, Enum, ForeignKey, String
+from sqlalchemy import BigInteger, Enum, ForeignKey, String, false
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -24,9 +24,9 @@ class UserModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     name: Mapped[str] = mapped_column(String(50))
-    is_admin: Mapped[bool] = mapped_column(default=False)
-    shopping_status: Mapped[bool]
-    active_message_id: Mapped[int] = mapped_column(BigInteger)
+    is_admin: Mapped[bool] = mapped_column(default=False, server_default=false())
+    shopping_status: Mapped[bool] = mapped_column(default=False, server_default=false())
+    active_message_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     shopping_started_at: Mapped[datetime | None]
     purchases: Mapped[list[PurchaseModel]] = relationship(back_populates="user")
     requests: Mapped[list[RequestModel]] = relationship(back_populates="user")

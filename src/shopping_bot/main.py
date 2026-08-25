@@ -1,24 +1,28 @@
 import asyncio
+import os
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
+from shopping_bot.db.repository.user_repository import UserRepository
 from shopping_bot.handlers.base import router
+from shopping_bot.services.user_service import UserService
 
-import os
-
-load_dotenv()
+# load_dotenv()
 
 TOKEN = str(os.getenv("SHOPPING_BOT_TOKEN"))
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 dp.include_router(router)
 
+repository = UserRepository()
+service = UserService(repository)
+
 
 async def main():
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, user_controller=service)
 
 
 if __name__ == "__main__":

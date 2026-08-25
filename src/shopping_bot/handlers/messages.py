@@ -2,10 +2,7 @@ from enum import Enum
 
 from shopping_bot.core.domain import ResponseUserDomain, UserRegistrationResult
 
-HELP_MESSAGE = """
-/start - user User registration
-/help - this message
-"""
+HELP_MESSAGE = "/start - user User registration\n/help - this message"
 
 
 class ErrorMessage(Enum):
