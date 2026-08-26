@@ -7,6 +7,7 @@ from aiogram.enums import ParseMode
 
 # from dotenv import load_dotenv
 from shopping_bot.db.repository.user_repository import UserRepository
+from shopping_bot.handlers.add_products import add_router
 from shopping_bot.handlers.base import router
 from shopping_bot.services.user_service import UserService
 
@@ -16,9 +17,13 @@ TOKEN = str(os.getenv("SHOPPING_BOT_TOKEN"))
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 dp.include_router(router)
+dp.include_router(add_router)
 
+# Register User repository and User service to User handlers
 repository = UserRepository()
 service = UserService(repository)
+
+# TODO: Register Product repository and Product service to Product handers
 
 
 async def main():
