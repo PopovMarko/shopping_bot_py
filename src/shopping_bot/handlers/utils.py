@@ -21,7 +21,7 @@ def user_to_domain(user: User) -> RequestUserDomain:
 
 async def parse_product_response(
     message: Message, state: FSMContext, response: ResponseProductDomain
-):
+) -> None:
     match response.result:
         case ProductInputResult.PRODUCT_FOUND:
             await state.update_data(product_id=response.product_id)
