@@ -59,6 +59,7 @@ class RequestModel(Base):
         default=RequestStatus.pending,
     )
     user: Mapped[UserModel] = relationship(back_populates="requests")
+    product: Mapped[ProductModel] = relationship(back_populates="products")
 
 
 class ReceiptModel(Base):

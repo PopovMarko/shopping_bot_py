@@ -1,6 +1,6 @@
 from enum import Enum
 
-from shopping_bot.core.domain import ResponseUserDomain, UserRegistrationResult
+from shopping_bot.core.domain import UserDomain, UserRegistrationResult
 
 HELP_MESSAGE = "/start - user User registration\n/help - this message"
 
@@ -9,7 +9,7 @@ class ErrorMessage(Enum):
     INVALID_USER = "Invalid user ID or user name"
 
 
-def user_domain_to_string(response: ResponseUserDomain) -> str:
+def user_domain_to_string(response: UserDomain) -> str:
     match response.msg:
         case UserRegistrationResult.REGISTERED_USER:
             return f"Welcome back {response.name}"

@@ -81,8 +81,6 @@ def mock_response():
     response = AsyncMock()
     response.product_id = 1
     response.product_name = "milk"
-    response.suggested_product_id = 2
-    response.suggested_name = "bread"
     response.quantity = 10
     response.units = "kilo"
     return response

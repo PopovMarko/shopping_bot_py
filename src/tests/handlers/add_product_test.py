@@ -57,16 +57,19 @@ async def test_process_confirm_product(
 ):
     mock_message = mock_message_factory(mock_user, text)
     mock_product_controller.process_confirmation.return_value = mock_response
-    mock_state.get_value.return_value = mock_response.suggested_product_id
+    mock_state.get_value.return_value = mock_response.product_id
     await process_confirm_product(mock_message, mock_state, mock_product_controller)
     if text == "yes":
         mock_state.get_value.assert_awaited_once_with("suggested_product_id")
         mock_product_controller.process_confirmation.assert_awaited_once_with(
-            val, mock_response.suggested_product_id
+            val, mock_response.product_id, None
         )
+    # TODO issue with parameters
     else:
-        mock_state.get_value.assert_not_awaited()
-        mock_product_controller.process_confirmation.assert_awaited_once_with(val, None)
+        mock_state.get_value.assert_awaited_once_with("product_name")
+        mock_product_controller.process_confirmation.assert_awaited_once_with(
+            val, None, 1
+        )
 
 
 @pytest.mark.parametrize(

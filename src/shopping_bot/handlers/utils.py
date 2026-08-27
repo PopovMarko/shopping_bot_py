@@ -2,9 +2,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardMarkup, User
 
 from shopping_bot.core.domain import (
+    ProductDomain,
     ProductInputResult,
+    RequestDomain,
+    RequestInputResult,
     RequestUserDomain,
-    ResponseProductDomain,
 )
 from shopping_bot.keyboards.add_product_kbd import (
     PRODUCT_CONFIRM_KBD,
@@ -20,7 +22,7 @@ def user_to_domain(user: User) -> RequestUserDomain:
 
 
 async def parse_product_response(
-    message: Message, state: FSMContext, response: ResponseProductDomain
+    message: Message, state: FSMContext, response: ProductDomain
 ) -> None:
     match response.result:
         case ProductInputResult.PRODUCT_FOUND:
@@ -30,10 +32,10 @@ async def parse_product_response(
             await message.answer(f"Enter quantity for {response.product_name}")
             return
         case ProductInputResult.PRODUCT_NOT_FOUND_NEEDS_CONFIRMATION:
-            await state.update_data(suggested_product_id=response.suggested_product_id)
+            await state.update_data(suggested_product_id=response.product_id)
             await state.set_state(WaitFor.confirmation)
             await message.answer(
-                f"You mean {response.suggested_name}?",
+                f"You mean {response.product_name}?",
                 reply_markup=ReplyKeyboardMarkup(
                     keyboard=PRODUCT_CONFIRM_KBD, resize_keyboard=True
                 ),
@@ -43,9 +45,14 @@ async def parse_product_response(
             await state.set_state(WaitFor.units)
             await message.answer(f"Choose units for {response.product_name}")
             return
-        case ProductInputResult.QUANTITY_ACCEPTED:
+
+
+async def parse_request_response(
+    message: Message, state: FSMContext, response: RequestDomain
+) -> None:
+    match response.result:
+        case RequestInputResult.QUANTITY_ACCEPTED:
             await state.set_state(WaitFor.product)
             await message.answer("Enter next product or empty message to quit")
-            return
-        case ProductInputResult.INVALID_QUANTITY:
+        case RequestInputResult.INVALID_QUANTITY:
             await message.answer("Enter correct quantity")

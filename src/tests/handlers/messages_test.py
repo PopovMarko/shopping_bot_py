@@ -1,6 +1,6 @@
 import pytest
 
-from shopping_bot.core.domain import ResponseUserDomain, UserRegistrationResult
+from shopping_bot.core.domain import UserDomain, UserRegistrationResult
 from shopping_bot.handlers.messages import user_domain_to_string
 
 
@@ -15,6 +15,6 @@ from shopping_bot.handlers.messages import user_domain_to_string
     ],
 )
 def test_user_domain_to_string(status, response_string):
-    user_domain = ResponseUserDomain(status, 1, 123, "Marko")
+    user_domain = UserDomain(status, 1, 123, "Marko")
     res = user_domain_to_string(user_domain)
     assert res == response_string

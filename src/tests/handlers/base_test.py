@@ -2,7 +2,7 @@ import pytest
 
 from shopping_bot.core.domain import (
     RequestUserDomain,
-    ResponseUserDomain,
+    UserDomain,
     UserRegistrationResult,
 )
 from shopping_bot.handlers.base import start
@@ -36,7 +36,7 @@ async def test_start_when_from_user_is_new_user(
 
     mock_message = mock_message_factory(from_user=mock_user)
 
-    mock_user_controller.start_cmd.return_value = ResponseUserDomain(
+    mock_user_controller.start_cmd.return_value = UserDomain(
         msg=result_enum,
         id=mock_user.id,
         telegram_id=mock_user.telegram_id,

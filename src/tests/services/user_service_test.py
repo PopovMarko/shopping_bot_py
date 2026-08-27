@@ -1,10 +1,8 @@
-from unittest.mock import AsyncMock, MagicMock
-
 import pytest
 
 from shopping_bot.core.domain import (
     RequestUserDomain,
-    ResponseUserDomain,
+    UserDomain,
     UserRegistrationResult,
 )
 from shopping_bot.core.repository_dto import UserRecord
@@ -27,7 +25,7 @@ user = UserRecord(
     [
         (
             None,
-            ResponseUserDomain(
+            UserDomain(
                 msg=UserRegistrationResult.REGISTER_USER_SUCCESS,
                 id=1,
                 telegram_id=123,
@@ -36,7 +34,7 @@ user = UserRecord(
         ),
         (
             user,
-            ResponseUserDomain(
+            UserDomain(
                 msg=UserRegistrationResult.REGISTERED_USER,
                 id=1,
                 telegram_id=123,

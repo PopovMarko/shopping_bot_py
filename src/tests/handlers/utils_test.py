@@ -47,11 +47,11 @@ async def test_parse_product_response(
             )
         case ProductInputResult.PRODUCT_NOT_FOUND_NEEDS_CONFIRMATION:
             mock_state.update_data.assert_awaited_once_with(
-                suggested_product_id=mock_response.suggested_product_id
+                suggested_product_id=mock_response.product_id
             )
             mock_state.set_state.assert_awaited_once_with(WaitFor.confirmation)
             mock_message.answer.assert_awaited_once_with(
-                f"You mean {mock_response.suggested_name}?",
+                f"You mean {mock_response.product_name}?",
                 reply_markup=ReplyKeyboardMarkup(
                     keyboard=PRODUCT_CONFIRM_KBD, resize_keyboard=True
                 ),

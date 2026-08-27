@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
-from shopping_bot.core.interfaces import UserController
+from shopping_bot.core.interfaces import UserControllerInterface
 from shopping_bot.handlers.messages import (
     HELP_MESSAGE,
     ErrorMessage,
@@ -14,7 +14,7 @@ router = Router()
 
 
 @router.message(CommandStart())
-async def start(message: Message, user_controller: UserController):
+async def start(message: Message, user_controller: UserControllerInterface):
     if message.from_user is None:
         await message.answer(ErrorMessage.INVALID_USER.value)
         return
