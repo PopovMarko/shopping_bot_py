@@ -31,33 +31,31 @@ async def process_add_product(
     await parse_product_response(message, state, response)
 
 
-@add_router.message(WaitFor.confirmation, F.text.casefold() == "yes")
+@add_router.message(WaitFor.confirmation, F.text.casefold().in_({"yes", "no"}))
 async def process_confirm_product(
     message: Message, state: FSMContext, product_controller: ProductController
 ) -> None:
-    product_id = await state.get_value("suggested_product_id")
-    if product_id is None:
-        raise ValueError("suggested_product_id is None")
-    response = await product_controller.process_confirmation(True, product_id)
+    confirmed = False
+    if message.text == "yes":
+        confirmed = True
+
+    product_id = None
+    if confirmed:
+        product_id = await state.get_value("suggested_product_id")
+        if product_id is None:
+            raise ValueError("suggested_product_id is None")
+    response = await product_controller.process_confirmation(confirmed, product_id)
     await parse_product_response(message, state, response)
 
 
-@add_router.message(WaitFor.confirmation, F.text.casefold() == "no")
-async def process_not_confirm_product(
-    message: Message, state: FSMContext, product_controller: ProductController
-) -> None:
-    response = await product_controller.process_confirmation(False, None)
-    await parse_product_response(message, state, response)
-
-
-@add_router.message(WaitFor.confirmation)
-async def process_confirmation_invalid(message: Message) -> None:
-    await message.answer(
-        "Please choose Yes or No by buttons",
-        reply_markup=ReplyKeyboardMarkup(
-            keyboard=PRODUCT_CONFIRM_KBD, resize_keyboard=True
-        ),
-    )
+# @add_router.message(WaitFor.confirmation)
+# async def process_confirmation_invalid(message: Message) -> None:
+#     await message.answer(
+#         "Please choose Yes or No by buttons",
+#         reply_markup=ReplyKeyboardMarkup(
+#             keyboard=PRODUCT_CONFIRM_KBD, resize_keyboard=True
+#         ),
+#     )
 
 
 @add_router.message(WaitFor.quantity)

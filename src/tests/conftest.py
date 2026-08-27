@@ -69,7 +69,7 @@ def mock_product_controller():
 
 @pytest.fixture
 def mock_state():
-    state = MagicMock()
+    state = AsyncMock()
     state.set_state = AsyncMock()
     state.update_data = AsyncMock()
     state.get_vale = AsyncMock()
@@ -81,6 +81,7 @@ def mock_response():
     response = AsyncMock()
     response.product_id = 1
     response.product_name = "milk"
+    response.suggested_product_id = 2
     response.suggested_name = "bread"
     response.quantity = 10
     response.units = "kilo"
