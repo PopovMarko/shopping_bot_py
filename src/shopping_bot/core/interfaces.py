@@ -1,11 +1,27 @@
 from typing import Protocol
 
-from shopping_bot.core.domain import RequestUserDomain, ResponseUserDomain
+from shopping_bot.core.domain import (
+    RequestUserDomain,
+    ResponseProductDomain,
+    ResponseUserDomain,
+)
 from shopping_bot.core.repository_dto import UserRecord
 
 
 class UserController(Protocol):
     async def start_cmd(self, user: RequestUserDomain) -> ResponseUserDomain: ...
+
+
+class ProductController(Protocol):
+    # async def find_product_by_name(self, product_name: str) -> tuple[str, bool]: ...
+    async def process_quantity(
+        self, product_id: str, quantity: str
+    ) -> ResponseProductDomain: ...
+
+    async def process_product(self, naem: str) -> ResponseProductDomain: ...
+    async def process_confirmation(
+        self, confirm: bool, product_id: int | None
+    ) -> ResponseProductDomain: ...
 
 
 class RepositoryController(Protocol):

@@ -7,10 +7,11 @@ from shopping_bot.core.repository_dto import UserRecord
 
 @pytest.fixture
 def mock_message_factory():
-    def _make(from_user=None):
+    def _make(from_user=None, text=None):
         message = MagicMock()
         message.from_user = from_user
         message.answer = AsyncMock()
+        message.text = text
 
         return message
 
@@ -55,3 +56,33 @@ def mock_async_session_factory():
     session.__aenter__.return_value = session
     session.__aexit__.return_value = None
     return factory, session
+
+
+@pytest.fixture
+def mock_product_controller():
+    product_controller = MagicMock()
+    product_controller.process_quantity = AsyncMock()
+    product_controller.process_product = AsyncMock()
+    product_controller.process_confirmation = AsyncMock()
+    return product_controller
+
+
+@pytest.fixture
+def mock_state():
+    state = AsyncMock()
+    state.set_state = AsyncMock()
+    state.update_data = AsyncMock()
+    state.get_vale = AsyncMock()
+    return state
+
+
+@pytest.fixture
+def mock_response():
+    response = AsyncMock()
+    response.product_id = 1
+    response.product_name = "milk"
+    response.suggested_product_id = 2
+    response.suggested_name = "bread"
+    response.quantity = 10
+    response.units = "kilo"
+    return response
