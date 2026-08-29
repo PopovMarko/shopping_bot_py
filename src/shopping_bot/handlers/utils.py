@@ -1,28 +1,30 @@
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardMarkup, User
 
-from shopping_bot.core.domain import (
-    ProductDomain,
+from shopping_bot.core.domains.product_domain import (
     ProductInputResult,
-    RequestDomain,
-    RequestInputResult,
-    RequestUserDomain,
+    ResultProductDomain,
 )
+from shopping_bot.core.domains.request_domain import (
+    RequestInputResult,
+    ResultRequestDomain,
+)
+from shopping_bot.core.domains.user_domain import InputUserDomain
 from shopping_bot.keyboards.add_product_kbd import (
     PRODUCT_CONFIRM_KBD,
 )
 from shopping_bot.states.user_states import WaitFor
 
 
-def user_to_domain(user: User) -> RequestUserDomain:
+def user_to_domain(user: User) -> InputUserDomain:
     id = user.id
     name = user.first_name
 
-    return RequestUserDomain(id, name)
+    return InputUserDomain(id, name)
 
 
 async def parse_product_response(
-    message: Message, state: FSMContext, response: ProductDomain
+    message: Message, state: FSMContext, response: ResultProductDomain
 ) -> None:
     match response.result:
         case ProductInputResult.PRODUCT_FOUND:
@@ -42,13 +44,20 @@ async def parse_product_response(
             )
             return
         case ProductInputResult.PRODUCT_CREATED:
-            await state.set_state(WaitFor.units)
+            await state.update_data(product_name=response.product_name)
+            await state.set_state(WaitFor.unit)
             await message.answer(f"Choose units for {response.product_name}")
             return
+        case ProductInputResult.UNIT_ACCEPTED:
+            await state.set_state(WaitFor.quantity)
+            await message.answer(f"Enter quantity for {response.product_name}")
+            return
+        case ProductInputResult.INVALID_UNIT:
+            await message.answer(f"Enter valid unit for {response.product_name}")
 
 
 async def parse_request_response(
-    message: Message, state: FSMContext, response: RequestDomain
+    message: Message, state: FSMContext, response: ResultRequestDomain
 ) -> None:
     match response.result:
         case RequestInputResult.QUANTITY_ACCEPTED:

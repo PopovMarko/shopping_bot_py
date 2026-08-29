@@ -26,7 +26,7 @@ class UserModel(Base):
     name: Mapped[str] = mapped_column(String(50))
     is_admin: Mapped[bool] = mapped_column(default=False, server_default=false())
     shopping_status: Mapped[bool] = mapped_column(default=False, server_default=false())
-    active_message_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    active_message_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
     shopping_started_at: Mapped[datetime | None]
     purchases: Mapped[list[PurchaseModel]] = relationship(back_populates="user")
     requests: Mapped[list[RequestModel]] = relationship(back_populates="user")
@@ -59,7 +59,7 @@ class RequestModel(Base):
         default=RequestStatus.pending,
     )
     user: Mapped[UserModel] = relationship(back_populates="requests")
-    product: Mapped[ProductModel] = relationship(back_populates="products")
+    # product: Mapped[ProductModel] = relationship(back_populates="requests")
 
 
 class ReceiptModel(Base):
