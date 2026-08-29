@@ -9,6 +9,6 @@ class ResponseUserRecord:
     name: str
     is_admin: bool
     shopping_status: bool
-    active_massage_id: int | None
+    active_message_id: int | None
     shopping_started_at: datetime | None
     # TODO fields purshases and requests?

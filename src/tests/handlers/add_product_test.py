@@ -3,7 +3,6 @@ import pytest
 from shopping_bot.handlers.add_products import (
     add_product,
     process_add_product,
-    process_add_quantity,
     process_confirm_product,
 )
 from shopping_bot.states.user_states import WaitFor
@@ -38,7 +37,9 @@ async def test_process_add_product(
                 mock_message.text
             )
         case None:
-            mock_message.answer.assert_awaited_once_with("Enter product's name")
+            mock_message.answer.assert_awaited_once_with(
+                "Here is list of pending producs"
+            )
 
 
 @pytest.mark.parametrize(
@@ -69,34 +70,4 @@ async def test_process_confirm_product(
         mock_state.get_value.assert_awaited_once_with("product_name")
         mock_product_controller.process_confirmation.assert_awaited_once_with(
             val, None, 1
-        )
-
-
-@pytest.mark.parametrize(
-    "text",
-    ["10", None],
-)
-@pytest.mark.asyncio
-async def test_process_add_quantity(
-    mock_message_factory,
-    mock_state,
-    mock_product_controller,
-    mock_user,
-    mock_response,
-    text,
-):
-    mock_message = mock_message_factory(from_user=mock_user, text=text)
-    mock_state.get_value.side_effect = [
-        mock_response.product_name,
-        mock_response.product_id,
-    ]
-
-    await process_add_quantity(mock_message, mock_state, mock_product_controller)
-    if mock_message.text is None:
-        mock_message.answer.assert_awaited_once_with(
-            f"Enter quantity of {mock_response.product_name}"
-        )
-    else:
-        mock_product_controller.process_quantity.assert_awaited_once_with(
-            mock_response.product_id, "10"
         )

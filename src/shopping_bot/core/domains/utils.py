@@ -48,7 +48,7 @@ def to_response_user_domain(user: ResponseUserRecord) -> ResponseUserDomain:
         name=user.name,
         is_admin=user.is_admin,
         shopping_status=user.shopping_status,
-        active_message_id=user.active_massage_id,
+        active_message_id=user.active_message_id,
         shopping_started_at=user.shopping_started_at,
     )
 

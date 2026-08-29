@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from shopping_bot.core.repository_dto import UserRecord
+from shopping_bot.core.records.user_records import ResponseUserRecord
 
 
 @pytest.fixture
@@ -38,7 +38,10 @@ def mock_user_controller():
 
 @pytest.fixture
 def mock_repository_factory():
-    def _make(save_user_response: UserRecord, user_record: UserRecord | None = None):
+    def _make(
+        save_user_response: ResponseUserRecord,
+        user_record: ResponseUserRecord | None = None,
+    ):
         repository = MagicMock()
         repository.get_user_by_telegram_id = AsyncMock()
         repository.get_user_by_telegram_id.return_value = user_record

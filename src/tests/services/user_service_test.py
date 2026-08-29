@@ -1,14 +1,14 @@
 import pytest
 
-from shopping_bot.core.domain import (
-    RequestUserDomain,
-    UserDomain,
+from shopping_bot.core.domains.user_domain import (
+    InputUserDomain,
+    ResultUserDomain,
     UserRegistrationResult,
 )
-from shopping_bot.core.repository_dto import UserRecord
+from shopping_bot.core.records.user_records import ResponseUserRecord
 from shopping_bot.services.user_service import UserService
 
-user = UserRecord(
+user = ResponseUserRecord(
     id=1,
     telegram_id=123,
     name="Marko",
@@ -25,7 +25,7 @@ user = UserRecord(
     [
         (
             None,
-            UserDomain(
+            ResultUserDomain(
                 msg=UserRegistrationResult.REGISTER_USER_SUCCESS,
                 id=1,
                 telegram_id=123,
@@ -34,7 +34,7 @@ user = UserRecord(
         ),
         (
             user,
-            UserDomain(
+            ResultUserDomain(
                 msg=UserRegistrationResult.REGISTERED_USER,
                 id=1,
                 telegram_id=123,
@@ -46,7 +46,7 @@ user = UserRecord(
 async def test_start_cmd_user_exists_and_not_exists(
     mock_repository_factory, user_record, expected
 ):
-    user1 = RequestUserDomain(telegram_id=123, name="Marko")
+    user1 = InputUserDomain(telegram_id=123, name="Marko")
     mock_repository = mock_repository_factory(user, user_record)
 
     service = UserService(mock_repository)
