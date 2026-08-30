@@ -1,0 +1,6 @@
+[Logger]
+log_level = "DEBUG"
+
+[RapidFuzz]
+fuzzy_match_threshold = 85
+fuzzy_confirm_threshold = 50

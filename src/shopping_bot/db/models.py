@@ -1,22 +1,16 @@
 from __future__ import annotations
 
-import enum
 from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import BigInteger, Enum, ForeignKey, String, false
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
+from shopping_bot.core.records.utils import RequestStatus
+
 
 class Base(DeclarativeBase):
     pass
-
-
-class RequestStatus(str, enum.Enum):
-    pending = "pending"
-    in_cart = "in_cart"
-    fulfilled = "fulfilled"
-    cancelled = "cancelled"
 
 
 class UserModel(Base):
@@ -58,8 +52,8 @@ class RequestModel(Base):
         Enum(RequestStatus, name="request_status_constraint"),
         default=RequestStatus.pending,
     )
-    user: Mapped[UserModel] = relationship(back_populates="requests")
-    # product: Mapped[ProductModel] = relationship(back_populates="requests")
+    user: Mapped[UserModel] = relationship(back_populates="requests", lazy="selectin")
+    product: Mapped[ProductModel] = relationship(lazy="selectin")
 
 
 class ReceiptModel(Base):

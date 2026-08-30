@@ -11,6 +11,7 @@ from shopping_bot.core.interfaces import (
     RequestRepositoryInterface,
     UserControllerInterface,
 )
+from shopping_bot.core.records.utils import RequestStatus
 
 
 class RequestService:
@@ -41,7 +42,8 @@ class RequestService:
                 product_id=product_id,
                 requested_by_user_id=user_id,
                 requested_quantity=int(quantity),
-                registered_at=now,
+                requested_at=now,
+                status=RequestStatus.pending,
             )
         )
         return to_request_domain(

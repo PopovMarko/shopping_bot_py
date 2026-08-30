@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ResponseProductRecord:
-    id: int
     name: str
-    unit: str
+    id: int | None = None
+    unit: str | None = None
     description: str | None = None

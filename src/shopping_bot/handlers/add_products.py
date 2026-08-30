@@ -41,6 +41,7 @@ async def process_add_product(
 async def process_confirm_product(
     message: Message, state: FSMContext, product_controller: ProductControllerInterface
 ) -> None:
+
     confirmed = False
     if message.text == "yes":
         confirmed = True

@@ -1,5 +1,8 @@
+import logging
+
 from rapidfuzz import fuzz, process
 
+from shopping_bot.core.config import Settings
 from shopping_bot.core.domains.product_domain import (
     InputProductDomain,
     ProductInputResult,
@@ -11,6 +14,8 @@ from shopping_bot.core.interfaces import (
 )
 from shopping_bot.db.repository.utils import ResponseProductRecord
 
+log = logging.getLogger(__name__)
+
 
 class ProductController:
     def __init__(self, repository: ProductRepositoryInterface) -> None:
@@ -20,24 +25,37 @@ class ProductController:
         self,
         product_name: str,
     ) -> ResultProductDomain:
+        settings = Settings()
         product_record_list = await self.repository.get_products()
-        product_list = [i.name for i in product_record_list]
+        product_list = [p.name for p in product_record_list]
         # fuzz_result = tupl of find_name, %, index
 
         extraction = process.extractOne(product_name, product_list, scorer=fuzz.ratio)
         confidence = extraction[1] if extraction is not None else 0
 
-        if confidence >= 85:
+        if confidence >= settings.fuzzy_match_threshold:
             product = product_record_list[extraction[2]]
+            log.debug(
+                "product: %s found with confidence %d%%", product.name, confidence
+            )
             return to_product_domain(ProductInputResult.PRODUCT_FOUND, product)
-        elif confidence >= 75:
+        elif confidence >= settings.fuzzy_confirm_threshold:
             product = product_record_list[extraction[2]]
+            log.debug(
+                "product: %s not found with confidence %d%%, confirmation started",
+                product.name,
+                confidence,
+            )
             return to_product_domain(
                 ProductInputResult.PRODUCT_NOT_FOUND_NEEDS_CONFIRMATION, product
             )
         else:
-            # product = await self.repository.create_product(product_name)
             product = ResponseProductRecord(name=product_name)
+            log.debug(
+                "product: %s not found with confidence %d%% ceration started",
+                product.name,
+                confidence,
+            )
             return to_product_domain(ProductInputResult.PRODUCT_CREATED, product)
 
     async def process_confirmation(
@@ -60,4 +78,5 @@ class ProductController:
             raise ValueError
         product = InputProductDomain(name, unit_str, None)
         response = await self.repository.create_product(product)
+
         return to_product_domain(ProductInputResult.UNIT_ACCEPTED, response)

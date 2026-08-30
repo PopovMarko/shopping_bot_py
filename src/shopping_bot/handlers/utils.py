@@ -39,7 +39,9 @@ async def parse_product_response(
             await message.answer(
                 f"You mean {response.product_name}?",
                 reply_markup=ReplyKeyboardMarkup(
-                    keyboard=PRODUCT_CONFIRM_KBD, resize_keyboard=True
+                    keyboard=PRODUCT_CONFIRM_KBD,
+                    resize_keyboard=True,
+                    one_time_keyboard=True,
                 ),
             )
             return

@@ -4,8 +4,8 @@ from decimal import Decimal
 from enum import Enum, auto
 
 from shopping_bot.core.domains.product_domain import ResultProductDomain
-from shopping_bot.core.domains.user_domain import ResponseUserDomain
-from shopping_bot.db.models import RequestStatus
+from shopping_bot.core.domains.user_domain import ResponseUserDomain, ResultUserDomain
+from shopping_bot.core.records.utils import RequestStatus
 
 
 class RequestInputResult(Enum):
@@ -17,9 +17,10 @@ class RequestInputResult(Enum):
 class ResultRequestDomain:
     result: RequestInputResult
     product: ResultProductDomain | None = None
+    user: ResultUserDomain | None = None
     user_id: int | None = None
     quantity: Decimal | None = None
-    registered_at: datetime | None = None
+    requested_at: datetime | None = None
     status: RequestStatus | None = None
 
 
@@ -28,7 +29,7 @@ class InputRequestDomain:
     product_id: int
     requested_by_user_id: int
     requested_quantity: int
-    registered_at: datetime
+    requested_at: datetime
     status: RequestStatus | None = None
 
 

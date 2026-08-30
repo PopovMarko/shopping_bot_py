@@ -44,10 +44,10 @@ user = ResponseUserRecord(
     ],
 )
 async def test_start_cmd_user_exists_and_not_exists(
-    mock_repository_factory, user_record, expected
+    mock_user_repository_factory, user_record, expected
 ):
     user1 = InputUserDomain(telegram_id=123, name="Marko")
-    mock_repository = mock_repository_factory(user, user_record)
+    mock_repository = mock_user_repository_factory(user, user_record)
 
     service = UserService(mock_repository)
     res = await service.start_cmd(user1)

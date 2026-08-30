@@ -21,6 +21,7 @@ class RequestRepository:
             res = await session.execute(
                 insert(RequestModel).values(**asdict(request)).returning(RequestModel)
             )
+            await session.commit()
             request_model = res.scalar_one()
             return to_request_record(request_model)
 
