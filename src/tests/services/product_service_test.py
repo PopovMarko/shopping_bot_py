@@ -2,7 +2,6 @@ import pytest
 
 from shopping_bot.core.domains.product_domain import (
     ProductInputResult,
-    ResultProductDomain,
 )
 from shopping_bot.core.domains.utils import to_product_domain
 from shopping_bot.core.records.product_records import ResponseProductRecord

@@ -9,6 +9,7 @@ from shopping_bot.handlers.utils import parse_product_response, parse_request_re
 from shopping_bot.keyboards.add_product_kbd import (
     PRODUCT_CONFIRM_KBD,
 )
+from shopping_bot.keyboards.main_kbd import get_cancel_keyboard
 from shopping_bot.states.user_states import WaitFor
 
 
@@ -61,7 +62,9 @@ async def test_parse_product_response(
             mock_message.answer.assert_awaited_once_with(
                 f"You mean {mock_response.product_name}?",
                 reply_markup=ReplyKeyboardMarkup(
-                    keyboard=PRODUCT_CONFIRM_KBD, resize_keyboard=True
+                    keyboard=PRODUCT_CONFIRM_KBD,
+                    resize_keyboard=True,
+                    one_time_keyboard=True,
                 ),
             )
         case ProductInputResult.PRODUCT_CREATED:
@@ -72,7 +75,7 @@ async def test_parse_product_response(
         case RequestInputResult.QUANTITY_ACCEPTED:
             mock_state.set_state.assert_awaited_once_with(WaitFor.product)
             mock_message.answer.assert_awaited_once_with(
-                "Enter next product or empty message to quit"
+                "Enter next product or End to quit", reply_markup=get_cancel_keyboard()
             )
         case RequestInputResult.INVALID_QUANTITY:
             mock_message.answer.assert_awaited_once_with("Enter correct quantity")

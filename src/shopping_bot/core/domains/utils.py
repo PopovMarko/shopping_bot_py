@@ -7,6 +7,7 @@ from shopping_bot.core.domains.product_domain import (
 )
 from shopping_bot.core.domains.request_domain import (
     RequestInputResult,
+    ResponseRequestDomain,
     ResultRequestDomain,
 )
 from shopping_bot.core.domains.user_domain import ResponseUserDomain
@@ -64,4 +65,17 @@ def to_request_domain(
         quantity=quantity,
         requested_at=request_record.requested_at,
         status=request_record.status,
+    )
+
+
+def to_response_request_domain(
+    response: ResponseRequestRecord,
+) -> ResponseRequestDomain:
+    return ResponseRequestDomain(
+        id=response.id,
+        product=to_response_product_domain(response.product),
+        requested_by_user=to_response_user_domain(response.user),
+        requested_quantity=response.requested_quantity,
+        requested_at=response.requested_at,
+        status=response.status,
     )

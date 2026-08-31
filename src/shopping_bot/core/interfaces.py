@@ -6,6 +6,7 @@ from shopping_bot.core.domains.product_domain import (
 )
 from shopping_bot.core.domains.request_domain import (
     InputRequestDomain,
+    ResponseRequestDomain,
     ResultRequestDomain,
 )
 from shopping_bot.core.domains.user_domain import InputUserDomain, ResultUserDomain
@@ -31,6 +32,7 @@ class RequestControllerInterface(Protocol):
     async def process_quantity(
         self, product_id: int, quantity: str, user_id: int
     ) -> ResultRequestDomain: ...
+    async def process_request_list(self) -> list[ResponseRequestDomain]: ...
 
 
 class UserRepositoryInterface(Protocol):
@@ -53,3 +55,4 @@ class RequestRepositoryInterface(Protocol):
     async def create_request(
         self, request: InputRequestDomain
     ) -> ResponseRequestRecord: ...
+    async def get_request_list(self) -> list[ResponseRequestRecord]: ...

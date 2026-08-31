@@ -9,6 +9,7 @@ from shopping_bot.handlers.messages import (
     user_domain_to_string,
 )
 from shopping_bot.handlers.utils import user_to_domain
+from shopping_bot.keyboards.main_kbd import get_main_keyboard
 
 router = Router()
 
@@ -20,7 +21,9 @@ async def start(message: Message, user_controller: UserControllerInterface):
         return
     user = user_to_domain(message.from_user)
     response = await user_controller.start_cmd(user)
-    await message.answer(user_domain_to_string(response))
+    await message.answer(
+        user_domain_to_string(response), reply_markup=get_main_keyboard()
+    )
 
 
 @router.message(Command("help"))

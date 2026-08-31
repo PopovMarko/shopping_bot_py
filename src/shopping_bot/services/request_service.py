@@ -4,9 +4,13 @@ from decimal import Decimal, InvalidOperation
 from shopping_bot.core.domains.request_domain import (
     InputRequestDomain,
     RequestInputResult,
+    ResponseRequestDomain,
     ResultRequestDomain,
 )
-from shopping_bot.core.domains.utils import to_request_domain
+from shopping_bot.core.domains.utils import (
+    to_request_domain,
+    to_response_request_domain,
+)
 from shopping_bot.core.interfaces import (
     RequestRepositoryInterface,
     UserControllerInterface,
@@ -49,3 +53,10 @@ class RequestService:
         return to_request_domain(
             RequestInputResult.QUANTITY_ACCEPTED, request, quantity
         )
+
+    async def process_request_list(self) -> list[ResponseRequestDomain]:
+        list_request_record = await self.repository.get_request_list()
+        list_request_domain: list[ResponseRequestDomain] = []
+        for r in list_request_record:
+            list_request_domain.append(to_response_request_domain(r))
+        return list_request_domain

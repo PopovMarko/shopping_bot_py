@@ -5,6 +5,7 @@ from shopping_bot.handlers.add_products import (
     process_add_product,
     process_confirm_product,
 )
+from shopping_bot.keyboards.main_kbd import get_cancel_keyboard
 from shopping_bot.states.user_states import WaitFor
 
 
@@ -14,7 +15,9 @@ async def test_add_product(mock_message_factory, mock_user, mock_state):
 
     await add_product(mock_message, mock_state)
 
-    mock_message.answer.assert_awaited_once_with("Введите название продукта:")
+    mock_message.answer.assert_awaited_once_with(
+        "Введите название продукта:", reply_markup=get_cancel_keyboard()
+    )
     mock_state.set_state.assert_awaited_once_with(WaitFor.product)
 
 
@@ -37,9 +40,7 @@ async def test_process_add_product(
                 mock_message.text
             )
         case None:
-            mock_message.answer.assert_awaited_once_with(
-                "Here is list of pending producs"
-            )
+            mock_message.answer.assert_awaited_once_with("Enter product name")
 
 
 @pytest.mark.parametrize(

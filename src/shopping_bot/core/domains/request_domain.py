@@ -3,7 +3,10 @@ from datetime import datetime
 from decimal import Decimal
 from enum import Enum, auto
 
-from shopping_bot.core.domains.product_domain import ResultProductDomain
+from shopping_bot.core.domains.product_domain import (
+    ResponseProductDomain,
+    ResultProductDomain,
+)
 from shopping_bot.core.domains.user_domain import ResponseUserDomain, ResultUserDomain
 from shopping_bot.core.records.utils import RequestStatus
 
@@ -36,8 +39,8 @@ class InputRequestDomain:
 @dataclass
 class ResponseRequestDomain:
     id: int
-    product_id: int
+    product: ResponseProductDomain
     requested_by_user: ResponseUserDomain
     requested_quantity: Decimal
-    registered_at: datetime
+    requested_at: datetime
     status: RequestStatus | None = None

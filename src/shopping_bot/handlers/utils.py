@@ -1,5 +1,5 @@
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardMarkup, User
+from aiogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup, User
 
 from shopping_bot.core.domains.product_domain import (
     ProductInputResult,
@@ -13,6 +13,7 @@ from shopping_bot.core.domains.user_domain import InputUserDomain
 from shopping_bot.keyboards.add_product_kbd import (
     PRODUCT_CONFIRM_KBD,
 )
+from shopping_bot.keyboards.main_kbd import get_cancel_keyboard
 from shopping_bot.states.user_states import WaitFor
 
 
@@ -51,6 +52,8 @@ async def parse_product_response(
             await message.answer(f"Choose units for {response.product_name}")
             return
         case ProductInputResult.UNIT_ACCEPTED:
+            await state.update_data(product_id=response.product_id)
+            await state.update_data(product_name=response.product_name)
             await state.set_state(WaitFor.quantity)
             await message.answer(f"Enter quantity for {response.product_name}")
             return
@@ -64,6 +67,8 @@ async def parse_request_response(
     match response.result:
         case RequestInputResult.QUANTITY_ACCEPTED:
             await state.set_state(WaitFor.product)
-            await message.answer("Enter next product or empty message to quit")
+            await message.answer(
+                "Enter next product or End to quit", reply_markup=get_cancel_keyboard()
+            )
         case RequestInputResult.INVALID_QUANTITY:
             await message.answer("Enter correct quantity")
