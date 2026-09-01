@@ -5,9 +5,8 @@ from enum import Enum, auto
 
 from shopping_bot.core.domains.product_domain import (
     ResponseProductDomain,
-    ResultProductDomain,
 )
-from shopping_bot.core.domains.user_domain import ResponseUserDomain, ResultUserDomain
+from shopping_bot.core.domains.user_domain import ResponseUserDomain
 from shopping_bot.core.records.utils import RequestStatus
 
 
@@ -19,8 +18,8 @@ class RequestInputResult(Enum):
 @dataclass
 class ResultRequestDomain:
     result: RequestInputResult
-    product: ResultProductDomain | None = None
-    user: ResultUserDomain | None = None
+    product: ResponseProductDomain | None = None
+    user: ResponseUserDomain | None = None
     user_id: int | None = None
     quantity: Decimal | None = None
     requested_at: datetime | None = None

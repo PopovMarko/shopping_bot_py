@@ -2,7 +2,6 @@ import pytest
 
 from shopping_bot.handlers.add_products import (
     add_product,
-    process_add_product,
     process_confirm_product,
 )
 from shopping_bot.keyboards.main_kbd import get_cancel_keyboard
@@ -33,7 +32,7 @@ async def test_process_add_product(
 ):
     mock_message = mock_message_factory(from_user=mock_user, text=message_text)
 
-    await process_add_product(mock_message, mock_state, mock_product_controller)
+    await add_product(mock_message, mock_state, mock_product_controller)
     match message_text:
         case "milk":
             mock_product_controller.process_product.assert_awaited_once_with(

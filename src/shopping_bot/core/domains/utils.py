@@ -61,7 +61,7 @@ def to_request_domain(
     return ResultRequestDomain(
         result=result,
         product=to_response_product_domain(request_record.product),
-        user=request_record.user,
+        user=to_response_user_domain(request_record.user),
         quantity=quantity,
         requested_at=request_record.requested_at,
         status=request_record.status,

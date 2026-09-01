@@ -7,7 +7,7 @@ import pytest
 def mock_user_controller():
     user_controller = MagicMock()
     user_controller.start_cmd = AsyncMock()
-
+    user_controller.get_user_id_by_telegram_id = AsyncMock()
     return user_controller
 
 
@@ -37,3 +37,12 @@ def mock_response():
     response.quantity = 10
     response.units = "kilo"
     return response
+
+
+@pytest.fixture
+def mock_request_controller():
+    controller = AsyncMock()
+    controller.process_quantity = AsyncMock()
+    controller.prosess_request_list = AsyncMock()
+
+    return controller

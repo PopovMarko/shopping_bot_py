@@ -54,9 +54,34 @@ class RequestService:
             RequestInputResult.QUANTITY_ACCEPTED, request, quantity
         )
 
-    async def process_request_list(self) -> list[ResponseRequestDomain]:
-        list_request_record = await self.repository.get_request_list()
+    async def process_request_list(
+        self, *args: RequestStatus
+    ) -> list[ResponseRequestDomain]:
+        list_request_record = await self.repository.get_request_list(*args)
         list_request_domain: list[ResponseRequestDomain] = []
         for r in list_request_record:
             list_request_domain.append(to_response_request_domain(r))
         return list_request_domain
+
+    async def process_request_status(
+        self, request_id: int, status: RequestStatus
+    ) -> ResponseRequestDomain: ...
+
+    # Implement
+
+    async def process_request_in_cart_and_back(
+        self, request_id: int
+    ) -> list[ResponseRequestDomain]:
+        request = await self.repository.get_request_by_id(request_id)
+        match request.status:
+            case RequestStatus.pending:
+                status = RequestStatus.in_cart
+            case RequestStatus.in_cart:
+                status = RequestStatus.pending
+            case _:
+                status = RequestStatus.cancelled
+
+        _ = await self.process_request_status(request_id, status)
+        return await self.process_request_list(
+            RequestStatus.pending, RequestStatus.in_cart
+        )

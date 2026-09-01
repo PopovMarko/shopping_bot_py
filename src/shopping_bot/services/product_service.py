@@ -13,6 +13,7 @@ from shopping_bot.core.interfaces import (
     ProductRepositoryInterface,
 )
 from shopping_bot.db.repository.utils import ResponseProductRecord
+from shopping_bot.services.utils import parse_product_input
 
 log = logging.getLogger(__name__)
 
@@ -23,18 +24,28 @@ class ProductController:
 
     async def process_product(
         self,
-        product_name: str,
+        product_input: str,
     ) -> ResultProductDomain:
         settings = Settings()
         product_record_list = await self.repository.get_products()
-        product_list = [p.name for p in product_record_list]
-        # fuzz_result = tupl of find_name, %, index
+        product_name_list = [p.name for p in product_record_list]
+        parsed_product_input: dict[str, str | None] = parse_product_input(product_input)
+        log.debug(parsed_product_input)
 
-        extraction = process.extractOne(product_name, product_list, scorer=fuzz.ratio)
+        if parsed_product_input["name"] is None:
+            raise ValueError("can't parse product_input")
+        product_name = parsed_product_input["name"]
+
+        # TODO change scorer to token scorer
+        extraction = process.extractOne(
+            product_name,
+            product_name_list,
+            scorer=fuzz.ratio,
+        )
         confidence = extraction[1] if extraction is not None else 0
 
         if confidence >= settings.fuzzy_match_threshold:
-            product = product_record_list[extraction[2]]
+            product: ResponseProductRecord = product_record_list[extraction[2]]
             log.debug(
                 "product: %s found with confidence %d%%", product.name, confidence
             )
@@ -56,6 +67,7 @@ class ProductController:
                 product.name,
                 confidence,
             )
+            product.unit = parsed_product_input["unit"]
             return to_product_domain(ProductInputResult.PRODUCT_CREATED, product)
 
     async def process_confirmation(

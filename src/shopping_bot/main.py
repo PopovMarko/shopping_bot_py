@@ -7,6 +7,7 @@ import os
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.fsm.strategy import FSMStrategy
 from dotenv import load_dotenv
 
 from shopping_bot.core.config import Settings
@@ -16,6 +17,7 @@ from shopping_bot.db.repository.request_repository import RequestRepository
 from shopping_bot.db.repository.user_repository import UserRepository
 from shopping_bot.handlers.add_products import product_router
 from shopping_bot.handlers.base import router
+from shopping_bot.handlers.in_store import store_router
 from shopping_bot.services.product_service import ProductController
 from shopping_bot.services.request_service import RequestService
 from shopping_bot.services.user_service import UserService
@@ -25,9 +27,12 @@ settings = Settings()
 
 TOKEN = str(os.getenv("SHOPPING_BOT_TOKEN"))
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
+dp = Dispatcher(
+    FSMStrategy=FSMStrategy.GLOBAL_USER,
+)
 dp.include_router(router)
 dp.include_router(product_router)
+dp.include_router(store_router)
 
 configure_logger(settings.log_level)
 log = logging.getLogger(__name__)

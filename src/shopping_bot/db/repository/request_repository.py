@@ -26,17 +26,27 @@ class RequestRepository:
             request_model = res.scalar_one()
             return to_request_record(request_model)
 
-    async def get_request_list(self) -> list[ResponseRequestRecord]:
+    async def get_request_list(
+        self, filters: RequestStatus
+    ) -> list[ResponseRequestRecord]:
 
         async with async_session_factory() as session:
             res = await session.execute(
-                select(RequestModel).where(RequestModel.status == RequestStatus.pending)
+                select(RequestModel).where(RequestModel.status.in_(filters))
             )
             list_request_model = res.scalars()
             list_request_record: list[ResponseRequestRecord] = []
             for m in list_request_model:
                 list_request_record.append(to_request_record(m))
             return list_request_record
+
+    async def get_request_by_id(self, request_id: int) -> ResponseRequestRecord:
+        async with async_session_factory() as session:
+            res = await session.execute(
+                select(RequestModel).where(RequestModel.id == request_id)
+            )
+            request_model = res.scalar_one()
+            return to_request_record(request_model)
 
 
 def to_request_record(request: RequestModel) -> ResponseRequestRecord:

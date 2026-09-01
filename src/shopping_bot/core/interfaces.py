@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Iterable, Protocol
 
 from shopping_bot.core.domains.product_domain import (
     InputProductDomain,
@@ -13,6 +13,7 @@ from shopping_bot.core.domains.user_domain import InputUserDomain, ResultUserDom
 from shopping_bot.core.records.product_records import ResponseProductRecord
 from shopping_bot.core.records.request_records import ResponseRequestRecord
 from shopping_bot.core.records.user_records import ResponseUserRecord
+from shopping_bot.core.records.utils import RequestStatus
 
 
 class UserControllerInterface(Protocol):
@@ -32,7 +33,16 @@ class RequestControllerInterface(Protocol):
     async def process_quantity(
         self, product_id: int, quantity: str, user_id: int
     ) -> ResultRequestDomain: ...
-    async def process_request_list(self) -> list[ResponseRequestDomain]: ...
+    async def process_request_list(
+        self, *args: RequestStatus
+    ) -> list[ResponseRequestDomain]: ...
+    async def process_request_by_id(self, request_id: int) -> ResponseRequestDomain: ...
+    async def process_request_status(
+        self, request_id: int, status: RequestStatus
+    ) -> ResponseRequestDomain: ...
+    async def process_request_in_cart_and_back(
+        self, request_id: int
+    ) -> list[ResponseRequestDomain]: ...
 
 
 class UserRepositoryInterface(Protocol):
@@ -55,4 +65,11 @@ class RequestRepositoryInterface(Protocol):
     async def create_request(
         self, request: InputRequestDomain
     ) -> ResponseRequestRecord: ...
-    async def get_request_list(self) -> list[ResponseRequestRecord]: ...
+    async def get_request_list(
+        self, *args: RequestStatus
+    ) -> list[ResponseRequestRecord]: ...
+    async def get_request_by_id(self, request_id: int) -> ResponseRequestRecord: ...
+
+
+class InStoreControllerInterface(Protocol):
+    async def process_in_store(self) -> None: ...

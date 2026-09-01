@@ -30,3 +30,20 @@ def get_cancel_inline_keyboard() -> InlineKeyboardMarkup:
     builder.adjust(1)
 
     return builder.as_markup(resize_keyboard=True)
+
+
+def get_go_to_privat_keyboard(url: str) -> ReplyKeyboardMarkup:
+    builder = ReplyKeyboardBuilder()
+    builder.button(text="Перейти в личку", url=url)
+    builder.button(text="Отмена")
+    builder.adjust(1, 1)
+
+    return builder.as_markup(resize_keyboard=True, one_time_keyboard=True)
+
+
+def get_go_to_privat_inline_keyboard(url: str) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Перейти в личку", url=url)
+    builder.button(text="Отмена")
+
+    return builder.as_markup(resize_keyboard=True)

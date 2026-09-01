@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -9,10 +11,11 @@ from shopping_bot.handlers.utils import parse_request_response
 from shopping_bot.states.user_states import WaitFor
 
 request_router = Router()
+log = logging.getLogger(__name__)
 
 
 @request_router.message(WaitFor.quantity)
-async def process_add_quantity(
+async def add_quantity(
     message: Message, state: FSMContext, request_controller: RequestControllerInterface
 ) -> None:
     product_name = await state.get_value("product_name")
@@ -32,7 +35,7 @@ async def process_add_quantity(
 
 
 @request_router.message(Command("Список"))
-async def list_request(
+async def request_list(
     message: Message, request_controller: RequestControllerInterface
 ) -> None:
 

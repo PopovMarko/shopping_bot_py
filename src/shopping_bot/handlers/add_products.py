@@ -1,7 +1,9 @@
-from aiogram import F, Router
+import logging
+
+from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, Update
+from aiogram.types import Message
 
 from shopping_bot.core.interfaces import (
     ProductControllerInterface,
@@ -12,16 +14,24 @@ from shopping_bot.handlers.add_quantity import request_router
 from shopping_bot.handlers.utils import parse_product_response
 from shopping_bot.keyboards.main_kbd import (
     get_cancel_keyboard,
+    get_go_to_privat_inline_keyboard,
     get_main_keyboard,
 )
 from shopping_bot.states.user_states import WaitFor
+
+log = logging.getLogger(__name__)
 
 product_router = Router()
 product_router.include_router(request_router)
 
 
 @product_router.message(Command("Добавить"))
-async def add_product(message: Message, state: FSMContext) -> None:
+async def add_product(message: Message, state: FSMContext, bot: Bot) -> None:
+    if message.chat.type == "group":
+        bot_info = await bot.get_me()
+        url = f"https://t.me/{bot_info.username}"
+        message.answer("👇", reply_markup=get_go_to_privat_inline_keyboard(url))
+        return
 
     await state.set_state(WaitFor.product)
     await message.answer(
@@ -47,15 +57,15 @@ async def process_add_product(
     await parse_product_response(message, state, response)
 
 
-@product_router.callback_query(WaitFor.product)
-async def process_cancel_add_product(
-    update: Update, state: FSMContext, product_controller: ProductControllerInterface
-) -> None:
-    if update.callback_query is None:
-        raise ValueError("Callback query is None")
-    query = update.callback_query
-    query.answer()
-    await state.clear()
+# @product_router.callback_query(WaitFor.product)
+# async def process_cancel_add_product(
+#     update: Update, state: FSMContext, product_controller: ProductControllerInterface
+# ) -> None:
+#     if update.callback_query is None:
+#         raise ValueError("Callback query is None")
+#     query = update.callback_query
+#     query.answer()
+#     await state.clear()
 
 
 @product_router.message(WaitFor.confirmation, F.text.casefold().in_({"yes", "no"}))
@@ -80,11 +90,14 @@ async def process_confirm_product(
     response = await product_controller.process_confirmation(
         confirmed, product_id, product_name
     )
+    # if response.unit is not None:
+    #     await add_product_unit(message, state, product_controller)
+    #     return
     await parse_product_response(message, state, response)
 
 
 @product_router.message(WaitFor.unit)
-async def process_add_unit(
+async def add_product_unit(
     message: Message, state: FSMContext, product_controller: ProductControllerInterface
 ) -> None:
     if message.text is None:

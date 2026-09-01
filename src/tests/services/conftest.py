@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from shopping_bot.core.records.product_records import ResponseProductRecord
+from shopping_bot.core.records.request_records import ResponseRequestRecord
 from shopping_bot.core.records.user_records import ResponseUserRecord
 
 
@@ -40,3 +41,16 @@ def mock_product_repository_factory():
         return repository
 
     return _make
+
+
+@pytest.fixture
+def mock_request_repository_factory():
+    def _make(
+        request_record: ResponseRequestRecord,
+        request_record_list: list[ResponseRequestRecord],
+    ):
+        repository = MagicMock()
+        repository.create_request = AsyncMock()
+        repository.create_request.return_value = request_record
+        repository.get_request_list = AsyncMock()
+        repository.get_request_list.return_value = request_record_list
