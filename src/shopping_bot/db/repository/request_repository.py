@@ -11,8 +11,7 @@ from shopping_bot.core.records.utils import RequestStatus
 from shopping_bot.db.models import RequestModel
 from shopping_bot.db.postgres.engine import async_session_factory
 from shopping_bot.db.repository.utils import (
-    product_model_to_record,
-    user_model_to_record,
+    to_request_record,
 )
 
 
@@ -61,14 +60,3 @@ class RequestRepository:
                 .values(status=status)
             )
             await session.commit()
-
-
-def to_request_record(request: RequestModel) -> ResponseRequestRecord:
-    return ResponseRequestRecord(
-        id=request.id,
-        product=product_model_to_record(request.product),
-        user=user_model_to_record(request.user),
-        requested_quantity=request.requested_quantity,
-        requested_at=request.requested_at,
-        status=request.status,
-    )

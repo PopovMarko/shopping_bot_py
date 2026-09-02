@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from shopping_bot.core.interfaces import (
+from shopping_bot.core.interfaces.service.product_controller_interface import (
     ProductControllerInterface,
 )
 

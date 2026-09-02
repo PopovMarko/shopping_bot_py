@@ -1,6 +1,7 @@
 from shopping_bot.core.records.product_records import ResponseProductRecord
+from shopping_bot.core.records.request_records import ResponseRequestRecord
 from shopping_bot.core.records.user_records import ResponseUserRecord
-from shopping_bot.db.models import ProductModel, UserModel
+from shopping_bot.db.models import ProductModel, RequestModel, UserModel
 
 
 def user_model_to_record(user_model: UserModel) -> ResponseUserRecord:
@@ -21,4 +22,15 @@ def product_model_to_record(product: ProductModel) -> ResponseProductRecord:
         name=product.name,
         description=product.description,
         unit=product.unit,
+    )
+
+
+def to_request_record(request: RequestModel) -> ResponseRequestRecord:
+    return ResponseRequestRecord(
+        id=request.id,
+        product=product_model_to_record(request.product),
+        user=user_model_to_record(request.user),
+        requested_quantity=request.requested_quantity,
+        requested_at=request.requested_at,
+        status=request.status,
     )

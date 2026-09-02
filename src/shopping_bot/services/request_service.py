@@ -11,8 +11,10 @@ from shopping_bot.core.domains.utils import (
     to_request_domain,
     to_response_request_domain,
 )
-from shopping_bot.core.interfaces import (
+from shopping_bot.core.interfaces.repotsitory.request_repository_interface import (
     RequestRepositoryInterface,
+)
+from shopping_bot.core.interfaces.service.user_controller_interface import (
     UserControllerInterface,
 )
 from shopping_bot.core.records.utils import RequestStatus
@@ -21,10 +23,10 @@ from shopping_bot.core.records.utils import RequestStatus
 class RequestService:
     def __init__(
         self,
-        repository: RequestRepositoryInterface,
+        request_repository: RequestRepositoryInterface,
         user_service: UserControllerInterface,
     ) -> None:
-        self.repository = repository
+        self.repository = request_repository
         self.user_service = user_service
 
     async def process_quantity(

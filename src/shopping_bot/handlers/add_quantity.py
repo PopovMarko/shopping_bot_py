@@ -5,7 +5,9 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from shopping_bot.core.interfaces import RequestControllerInterface
+from shopping_bot.core.interfaces.service.request_controller_interface import (
+    RequestControllerInterface,
+)
 from shopping_bot.core.records.utils import RequestStatus
 from shopping_bot.handlers.messages import list_response_request_domain_to_string
 from shopping_bot.handlers.utils import parse_request_response

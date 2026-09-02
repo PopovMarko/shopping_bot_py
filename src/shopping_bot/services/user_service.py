@@ -3,7 +3,9 @@ from shopping_bot.core.domains.user_domain import (
     ResultUserDomain,
     UserRegistrationResult,
 )
-from shopping_bot.core.interfaces import UserRepositoryInterface
+from shopping_bot.core.interfaces.repotsitory.user_repository_interface import (
+    UserRepositoryInterface,
+)
 
 
 class UserService:

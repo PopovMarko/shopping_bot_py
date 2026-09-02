@@ -6,3 +6,4 @@ class WaitFor(StatesGroup):
     quantity = State()
     confirmation = State()
     unit = State()
+    photo = State()

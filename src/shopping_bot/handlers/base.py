@@ -2,7 +2,9 @@ from aiogram import Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
-from shopping_bot.core.interfaces import UserControllerInterface
+from shopping_bot.core.interfaces.service.user_controller_interface import (
+    UserControllerInterface,
+)
 from shopping_bot.handlers.messages import (
     HELP_MESSAGE,
     ErrorMessage,

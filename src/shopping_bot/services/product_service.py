@@ -9,7 +9,7 @@ from shopping_bot.core.domains.product_domain import (
     ResultProductDomain,
 )
 from shopping_bot.core.domains.utils import to_product_domain
-from shopping_bot.core.interfaces import (
+from shopping_bot.core.interfaces.repotsitory.product_rpository_interface import (
     ProductRepositoryInterface,
 )
 from shopping_bot.db.repository.utils import ResponseProductRecord

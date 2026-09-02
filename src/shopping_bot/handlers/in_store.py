@@ -2,16 +2,17 @@ import logging
 
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
-from magic_filter.operations import call
 
 from shopping_bot.core.interfaces import RequestControllerInterface
 from shopping_bot.core.records.utils import RequestStatus
+from shopping_bot.handlers.add_recipt import recipt_router
 from shopping_bot.keyboards.in_store_kbd import get_inline_product_list_keyboard
 from shopping_bot.keyboards.main_kbd import get_main_keyboard
 
 log = logging.getLogger(__name__)
 
 store_router = Router()
+store_router.include_router(recipt_router)
 
 
 @store_router.message(F.text == "/В магазине")
@@ -59,6 +60,7 @@ async def end_of_shopping(callback_query: CallbackQuery):
 
     if callback_query.message is not None:
         await callback_query.message.answer(
-            "Покупки закончены", reply_markup=get_main_keyboard()
+            "Покупки закончены. Сфотографируйте чек или экран кассы самообслуживания",
+            reply_markup=get_main_keyboard(),
         )
     await callback_query.answer()
