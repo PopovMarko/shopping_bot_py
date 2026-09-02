@@ -5,7 +5,7 @@ import pytest
 
 from shopping_bot.core.domains.request_domain import ResponseRequestDomain
 from shopping_bot.core.records.utils import RequestStatus
-from shopping_bot.handlers.add_quantity import list_request, process_add_quantity
+from shopping_bot.handlers.add_quantity import add_quantity, request_list
 
 
 @pytest.mark.parametrize(
@@ -27,7 +27,7 @@ async def test_process_add_quantity(
         mock_response.product_id,
     ]
 
-    await process_add_quantity(mock_message, mock_state, mock_request_controller)
+    await add_quantity(mock_message, mock_state, mock_request_controller)
     if mock_message.text is None:
         mock_message.answer.assert_awaited_once_with(
             f"Enter quantity of {mock_response.product_name}"
@@ -71,7 +71,7 @@ async def test_list_request(
 
     mock_request_controller.process_request_list.return_value = res
 
-    await list_request(mock_message, mock_request_controller)
+    await request_list(mock_message, mock_request_controller)
 
     mock_request_controller.process_request_list.assert_awaited_once()
     mock_message.answer.assert_awaited_once_with(res_str)

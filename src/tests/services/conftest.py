@@ -54,3 +54,6 @@ def mock_request_repository_factory():
         repository.create_request.return_value = request_record
         repository.get_request_list = AsyncMock()
         repository.get_request_list.return_value = request_record_list
+        return repository
+
+    return _make

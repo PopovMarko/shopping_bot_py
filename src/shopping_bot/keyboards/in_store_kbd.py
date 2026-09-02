@@ -28,6 +28,6 @@ def get_inline_product_list_keyboard(
         )
 
         builder.button(text=button_text, callback_data=f"cart_{r.id}")
-        builder.button(text="Закончить покупки", callback_data="stop")
+    builder.button(text="Закончить покупки", callback_data="stop")
     builder.adjust(1)
     return builder.as_markup()

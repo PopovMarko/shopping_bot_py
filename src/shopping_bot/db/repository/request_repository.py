@@ -1,8 +1,11 @@
 from dataclasses import asdict
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 
-from shopping_bot.core.domains.request_domain import InputRequestDomain
+from shopping_bot.core.domains.request_domain import (
+    InputRequestDomain,
+    ResponseRequestDomain,
+)
 from shopping_bot.core.records.request_records import ResponseRequestRecord
 from shopping_bot.core.records.utils import RequestStatus
 from shopping_bot.db.models import RequestModel
@@ -27,12 +30,12 @@ class RequestRepository:
             return to_request_record(request_model)
 
     async def get_request_list(
-        self, filters: RequestStatus
+        self, *args: RequestStatus
     ) -> list[ResponseRequestRecord]:
 
         async with async_session_factory() as session:
             res = await session.execute(
-                select(RequestModel).where(RequestModel.status.in_(filters))
+                select(RequestModel).where(RequestModel.status.in_(args))
             )
             list_request_model = res.scalars()
             list_request_record: list[ResponseRequestRecord] = []
@@ -47,6 +50,17 @@ class RequestRepository:
             )
             request_model = res.scalar_one()
             return to_request_record(request_model)
+
+    async def update_request_status(
+        self, request_id: int, status: RequestStatus
+    ) -> None:
+        async with async_session_factory() as session:
+            await session.execute(
+                update(RequestModel)
+                .where(RequestModel.id == request_id)
+                .values(status=status)
+            )
+            await session.commit()
 
 
 def to_request_record(request: RequestModel) -> ResponseRequestRecord:

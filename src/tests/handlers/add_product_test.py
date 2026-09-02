@@ -8,16 +8,27 @@ from shopping_bot.keyboards.main_kbd import get_cancel_keyboard
 from shopping_bot.states.user_states import WaitFor
 
 
+@pytest.mark.parametrize("chat_type", [("private",), ("group")])
 @pytest.mark.asyncio
-async def test_add_product(mock_message_factory, mock_user, mock_state):
-    mock_message = mock_message_factory(from_user=mock_user, text="добавить")
+async def test_add_product(
+    mock_message_factory, mock_user, mock_state, mock_bot, chat_type, mock_bot_info
+):
+    mock_bot.get_me.return_value = mock_bot_info()
 
-    await add_product(mock_message, mock_state)
-
-    mock_message.answer.assert_awaited_once_with(
-        "Введите название продукта:", reply_markup=get_cancel_keyboard()
+    mock_message = mock_message_factory(
+        from_user=mock_user, text="добавить", chat_type=chat_type
     )
-    mock_state.set_state.assert_awaited_once_with(WaitFor.product)
+
+    await add_product(mock_message, mock_state, mock_bot)
+
+    if chat_type != "group":
+        mock_message.answer.assert_awaited_once_with(
+            "Введите название продукта:", reply_markup=get_cancel_keyboard()
+        )
+        mock_state.set_state.assert_awaited_once_with(WaitFor.product)
+        mock_bot.get_me.assert_not_awaited()
+    else:
+        mock_bot.get_me.assert_awaited_once()
 
 
 @pytest.mark.parametrize("message_text", ["milk", None])
@@ -35,11 +46,11 @@ async def test_process_add_product(
     await add_product(mock_message, mock_state, mock_product_controller)
     match message_text:
         case "milk":
-            mock_product_controller.process_product.assert_awaited_once_with(
-                mock_message.text
-            )
+            mock_state.set_state.assert_awaited_once_with(WaitFor.product)
         case None:
-            mock_message.answer.assert_awaited_once_with("Enter product name")
+            mock_message.answer.assert_awaited_once_with(
+                "Введите название продукта:", reply_markup=get_cancel_keyboard()
+            )
 
 
 @pytest.mark.parametrize(

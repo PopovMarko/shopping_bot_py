@@ -63,12 +63,6 @@ class RequestService:
             list_request_domain.append(to_response_request_domain(r))
         return list_request_domain
 
-    async def process_request_status(
-        self, request_id: int, status: RequestStatus
-    ) -> ResponseRequestDomain: ...
-
-    # Implement
-
     async def process_request_in_cart_and_back(
         self, request_id: int
     ) -> list[ResponseRequestDomain]:
@@ -81,7 +75,7 @@ class RequestService:
             case _:
                 status = RequestStatus.cancelled
 
-        _ = await self.process_request_status(request_id, status)
+        _ = await self.repository.update_request_status(request_id, status)
         return await self.process_request_list(
             RequestStatus.pending, RequestStatus.in_cart
         )
