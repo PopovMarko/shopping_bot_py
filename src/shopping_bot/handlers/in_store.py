@@ -3,7 +3,9 @@ import logging
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
 
-from shopping_bot.core.interfaces import RequestControllerInterface
+from shopping_bot.core.interfaces.service.request_controller_interface import (
+    RequestControllerInterface,
+)
 from shopping_bot.core.records.utils import RequestStatus
 from shopping_bot.handlers.add_recipt import recipt_router
 from shopping_bot.keyboards.in_store_kbd import get_inline_product_list_keyboard
