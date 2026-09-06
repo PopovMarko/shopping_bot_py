@@ -29,8 +29,10 @@ product_router.include_router(request_router)
 async def add_product(message: Message, state: FSMContext, bot: Bot) -> None:
     if message.chat.type == "group":
         bot_info = await bot.get_me()
-        url = f"https://t.me/{bot_info.username}"
-        await message.answer("👇", reply_markup=get_go_to_privat_inline_keyboard(url))
+        url = f"https://t.me/{bot_info.username}?start=123"
+        await message.answer(
+            "👇 перейти в личку", reply_markup=get_go_to_privat_inline_keyboard(url)
+        )
         return
 
     await state.set_state(WaitFor.product)

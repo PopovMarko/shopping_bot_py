@@ -33,6 +33,10 @@ class StoreModel(Base):
     name: Mapped[str]
     address: Mapped[str]
 
+    receipts: Mapped[list[ReceiptModel]] = relationship(
+        back_populates="store", foreign_keys="ReceiptModel.store_id"
+    )
+
 
 class UserModel(Base):
     __tablename__ = "users"
@@ -53,7 +57,9 @@ class UserModel(Base):
         foreign_keys="RequestModel.purchased_by_user_id",
     )
     receipts: Mapped[list[ReceiptModel]] = relationship(
-        "ReceiptModel", back_populates="user"
+        "ReceiptModel",
+        back_populates="uploaded_by_user",
+        foreign_keys="ReceiptModel.uploaded_by_user_id",
     )
 
 
@@ -72,7 +78,7 @@ class RequestModel(Base):
     )
     price: Mapped[Decimal | None]
     quantity: Mapped[Decimal | None]
-    match_confidence: Mapped[Decimal | None]
+    match_confidence: Mapped[int | None]
     status: Mapped[RequestStatus] = mapped_column(
         Enum(RequestStatus, name="request_status_constraint"),
         default=RequestStatus.pending,
@@ -97,6 +103,9 @@ class ReceiptModel(Base):
     raw_model_response: Mapped[str | None]
     created_at: Mapped[datetime]
 
-    user: Mapped[UserModel] = relationship(
-        UserModel, back_populates="receipts", lazy="selectin"
+    uploaded_by_user: Mapped[UserModel] = relationship(
+        UserModel, back_populates="receipts", foreign_keys=uploaded_by_user_id
+    )
+    store: Mapped[StoreModel] = relationship(
+        back_populates="receipts", foreign_keys=store_id
     )

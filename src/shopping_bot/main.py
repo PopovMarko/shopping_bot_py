@@ -13,12 +13,14 @@ from dotenv import load_dotenv
 from shopping_bot.core.config import Settings
 from shopping_bot.core.logger import configure_logger
 from shopping_bot.db.repository.product_repository import ProductRepository
+from shopping_bot.db.repository.receipt_repository import ReceiptRepository
 from shopping_bot.db.repository.request_repository import RequestRepository
 from shopping_bot.db.repository.user_repository import UserRepository
 from shopping_bot.handlers.add_products import product_router
 from shopping_bot.handlers.base import router
 from shopping_bot.handlers.in_store import store_router
 from shopping_bot.services.product_service import ProductController
+from shopping_bot.services.receipt_service import ReceiptService
 from shopping_bot.services.request_service import RequestService
 from shopping_bot.services.user_service import UserService
 
@@ -52,6 +54,10 @@ request_repository = RequestRepository()
 request_service = RequestService(request_repository, user_service)
 log.debug("Initialised Request repository and service")
 
+receipt_repository = ReceiptRepository()
+receipt_service = ReceiptService(receipt_repository, user_repository)
+log.debug("Intialised Receipt repository and service")
+
 
 async def main():
     await dp.start_polling(
@@ -59,6 +65,7 @@ async def main():
         user_controller=user_service,
         product_controller=product_service,
         request_controller=request_service,
+        receipt_controller=receipt_service,
     )
 
 

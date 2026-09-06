@@ -1,3 +1,4 @@
+from aiogram.filters import callback_data
 from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import (
     InlineKeyboardBuilder,
@@ -11,7 +12,8 @@ def get_main_keyboard() -> ReplyKeyboardMarkup:
     builder.button(text="/Список")
     builder.button(text="/В магазине")
     builder.button(text="/На рынке")
-    builder.adjust(2, 2)
+    builder.button(text="Выйти")
+    builder.adjust(2, 2, 1)
 
     return builder.as_markup(resize_keyboard=True)
 
@@ -44,6 +46,6 @@ def get_go_to_privat_keyboard(url: str) -> ReplyKeyboardMarkup:
 def get_go_to_privat_inline_keyboard(url: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(text="Перейти в личку", url=url)
-    builder.button(text="Отмена")
+    builder.button(text="Отмена", callback_data="cancel")
 
     return builder.as_markup(resize_keyboard=True)

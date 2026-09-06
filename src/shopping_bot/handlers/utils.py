@@ -1,10 +1,11 @@
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, Message, ReplyKeyboardMarkup, User
+from aiogram.types import Message, ReplyKeyboardMarkup, User
 
 from shopping_bot.core.domains.product_domain import (
     ProductInputResult,
     ResultProductDomain,
 )
+from shopping_bot.core.domains.receipt_domain import InputStoreDomain
 from shopping_bot.core.domains.request_domain import (
     RequestInputResult,
     ResultRequestDomain,
@@ -22,6 +23,10 @@ def user_to_domain(user: User) -> InputUserDomain:
     name = user.first_name
 
     return InputUserDomain(id, name)
+
+
+def store_to_domain(store) -> InputStoreDomain:
+    return InputStoreDomain(name=store.name, address=store.address)
 
 
 async def parse_product_response(

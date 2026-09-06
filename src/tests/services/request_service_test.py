@@ -41,6 +41,11 @@ async def test_process_quantity(
         status=RequestStatus.pending,
         user=mock_user,
         product=mock_response,
+        purchased_by_user=None,
+        receipt=None,
+        price=None,
+        quantity=None,
+        match_confidence=None,
     )
 
     request_record_list = [request_record, request_record]
@@ -69,6 +74,11 @@ async def test_process_rquest_list(
         status=RequestStatus.pending,
         user=mock_user,
         product=mock_response,
+        purchased_by_user=None,
+        receipt=None,
+        price=None,
+        quantity=None,
+        match_confidence=None,
     )
 
     request_record_list = [request_record, request_record]

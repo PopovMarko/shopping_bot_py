@@ -18,3 +18,9 @@ class RequestControllerInterface(Protocol):
     async def process_request_in_cart_and_back(
         self, request_id: int
     ) -> list[ResponseRequestDomain]: ...
+
+
+class ReceiptControllerInterface(Protocol):
+    async def process_receipt(
+        self, receipt, user_telegram_id: int, requect_id_list: list[int]
+    ) -> None: ...

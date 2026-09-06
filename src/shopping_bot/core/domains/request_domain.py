@@ -43,3 +43,10 @@ class ResponseRequestDomain:
     requested_quantity: Decimal
     requested_at: datetime
     status: RequestStatus | None = None
+
+
+@dataclass
+class ResponseStoreDomain:
+    id: int | None
+    name: str
+    address: str | None

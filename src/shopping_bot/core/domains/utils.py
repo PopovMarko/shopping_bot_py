@@ -5,20 +5,25 @@ from shopping_bot.core.domains.product_domain import (
     ResponseProductDomain,
     ResultProductDomain,
 )
+from shopping_bot.core.domains.receipt_domain import ResponseReceiptDomain
 from shopping_bot.core.domains.request_domain import (
     RequestInputResult,
     ResponseRequestDomain,
+    ResponseStoreDomain,
     ResultRequestDomain,
 )
-from shopping_bot.core.domains.user_domain import ResponseUserDomain
+from shopping_bot.core.domains.user_domain import InputUserDomain, ResponseUserDomain
 from shopping_bot.core.records.product_records import (
     ResponseProductRecord,
 )
-from shopping_bot.core.records.request_records import ResponseRequestRecord
+from shopping_bot.core.records.request_records import (
+    ResponseReceiptRecord,
+    ResponseRequestRecord,
+    ResponseStoreRecord,
+)
 from shopping_bot.core.records.user_records import ResponseUserRecord
 
 
-# TODO to think to add quantity field
 def to_product_domain(
     input_result: ProductInputResult,
     product: ResponseProductRecord,
@@ -28,6 +33,12 @@ def to_product_domain(
         product_id=product.id,
         product_name=product.name,
         unit=product.unit,
+    )
+
+
+def user_record_to_input_domain(user: ResponseUserRecord) -> InputUserDomain:
+    return InputUserDomain(
+        telegram_id=user.telegram_id, name=user.name, is_admin=user.is_admin
     )
 
 
@@ -79,3 +90,21 @@ def to_response_request_domain(
         requested_at=response.requested_at,
         status=response.status,
     )
+
+
+def to_response_receipt_domain(
+    response: ResponseReceiptRecord,
+) -> ResponseReceiptDomain:
+    return ResponseReceiptDomain(
+        id=response.id,
+        store_id=response.store,
+        uploaded_by_user_id=response.uploaded_by_user_id,
+        receipt_date=response.receipt_date,
+        image_url=response.image_url,
+        raw_model_response=response.raw_model_response,
+        created_at=response.created_at,
+    )
+
+
+def store_record_to_domain(store: ResponseStoreRecord) -> ResponseStoreDomain:
+    return ResponseStoreDomain(id=store.id, name=store.name, address=store.address)

@@ -26,7 +26,7 @@ class ResultUserDomain:
 # TODO fields purchases and requests
 @dataclass
 class ResponseUserDomain:
-    id: int
+    id: int | None
     telegram_id: int
     name: str
     is_admin: bool

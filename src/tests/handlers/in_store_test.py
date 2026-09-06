@@ -50,7 +50,7 @@ async def test_in_store(
 
 @pytest.mark.asyncio
 async def test_request_in_cart_and_back(
-    mock_callback_query, mock_request_controller, mock_user, mock_response
+    mock_callback_query, mock_request_controller, mock_user, mock_response, mock_state
 ):
     now = datetime.now()
     request_domain_list = [
@@ -72,7 +72,9 @@ async def test_request_in_cart_and_back(
         ),
     ]
     mock_request_controller.process_request_list.return_value = request_domain_list
-    await request_in_cart_and_back(mock_callback_query, mock_request_controller)
+    await request_in_cart_and_back(
+        mock_callback_query, mock_state, mock_request_controller
+    )
     mock_callback_query.answer.assert_awaited_once()
     mock_request_controller.process_request_in_cart_and_back.assert_awaited_once_with(
         int(mock_callback_query.data.split("_")[1])

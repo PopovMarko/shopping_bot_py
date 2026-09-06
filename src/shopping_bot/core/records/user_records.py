@@ -4,7 +4,7 @@ from datetime import datetime
 
 @dataclass
 class ResponseUserRecord:
-    id: int
+    id: int | None
     telegram_id: int
     name: str
     is_admin: bool
