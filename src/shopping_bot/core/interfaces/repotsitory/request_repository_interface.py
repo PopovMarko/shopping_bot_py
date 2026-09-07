@@ -1,12 +1,10 @@
 from typing import Protocol
 
 from shopping_bot.core.domains.receipt_domain import (
-    InputReceiptDbDomain,
-    InputStoreDomain,
+    InputReceiptDomain,
 )
 from shopping_bot.core.domains.request_domain import (
     InputRequestDomain,
-    ResponseStoreDomain,
 )
 from shopping_bot.core.records.request_records import (
     ResponseReceiptRecord,
@@ -34,14 +32,16 @@ class RequestRepositoryInterface(Protocol):
 
 class ReceiptRepositoryInterface(Protocol):
     async def create_receipt(
-        self, receipt: InputReceiptDbDomain
+        self, receipt: InputReceiptDomain
     ) -> ResponseReceiptRecord: ...
 
     async def get_product_name_list(self, request_id_list: list[int]) -> list[str]: ...
 
     async def get_store_by_name_and_address(
-        self, store: ResponseStoreDomain
+        self,
+        name: str,
+        address: str,
     ) -> ResponseStoreRecord | None: ...
 
-    async def create_store(self, store: ResponseStoreDomain) -> ResponseStoreRecord: ...
+    async def create_store(self, name: str, address: str) -> ResponseStoreRecord: ...
     async def update_receipt(self) -> None: ...

@@ -14,9 +14,8 @@ class UserService:
 
     async def start_cmd(self, user: InputUserDomain) -> ResultUserDomain:
 
-        find_user = await self.repository.get_user_by_telegram_id(user.telegram_id)
         status = UserRegistrationResult.REGISTERED_USER
-
+        find_user = await self.repository.get_user_by_telegram_id(user.telegram_id)
         if find_user is None:
             find_user = await self.repository.save_user(user)
             status = UserRegistrationResult.REGISTER_USER_SUCCESS

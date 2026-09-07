@@ -5,8 +5,6 @@ from sqlalchemy import insert, select
 
 from shopping_bot.core.domains.receipt_domain import (
     InputReceiptDomain,
-    InputStoreDomain,
-    ResponseStoreDomain,
 )
 from shopping_bot.core.records.request_records import (
     ResponseReceiptRecord,
@@ -43,12 +41,13 @@ class ReceiptRepository:
 
     async def get_store_by_name_and_address(
         self,
-        store: InputStoreDomain,
+        name: str,
+        address: str,
     ) -> ResponseStoreRecord | None:
         async with async_session_factory() as session:
             res = await session.execute(
                 select(StoreModel).where(
-                    StoreModel.name == store.name, StoreModel.address == store.address
+                    StoreModel.name == name, StoreModel.address == address
                 )
             )
             store_model = res.scalar_one_or_none()
@@ -56,10 +55,10 @@ class ReceiptRepository:
                 return None
             return store_model_to_record(store_model)
 
-    async def create_store(self, store: ResponseStoreDomain) -> ResponseStoreRecord:
+    async def create_store(self, name: str, address: str) -> ResponseStoreRecord:
         async with async_session_factory() as session:
             res = await session.execute(
-                insert(StoreModel).values(**asdict(store)).returning(StoreModel)
+                insert(StoreModel).values(name, address).returning(StoreModel)
             )
             await session.commit()
             store_model = res.scalar_one()

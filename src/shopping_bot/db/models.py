@@ -25,6 +25,9 @@ class ProductModel(Base):
     name: Mapped[str]
     description: Mapped[str | None]
     unit: Mapped[str]
+    requests: Mapped[list[RequestModel]] = relationship(
+        "RequestModel", back_populates="product", foreign_keys="RequestModel.product_id"
+    )
 
 
 class StoreModel(Base):
@@ -32,10 +35,6 @@ class StoreModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     address: Mapped[str]
-
-    receipts: Mapped[list[ReceiptModel]] = relationship(
-        back_populates="store", foreign_keys="ReceiptModel.store_id"
-    )
 
 
 class UserModel(Base):
@@ -49,17 +48,9 @@ class UserModel(Base):
     shopping_started_at: Mapped[datetime | None]
 
     requests: Mapped[list[RequestModel]] = relationship(
+        "RequestModel",
         back_populates="requested_by_user",
         foreign_keys="RequestModel.requested_by_user_id",
-    )
-    purchases: Mapped[list[RequestModel]] = relationship(
-        back_populates="purchased_by_user",
-        foreign_keys="RequestModel.purchased_by_user_id",
-    )
-    receipts: Mapped[list[ReceiptModel]] = relationship(
-        "ReceiptModel",
-        back_populates="uploaded_by_user",
-        foreign_keys="ReceiptModel.uploaded_by_user_id",
     )
 
 
@@ -84,13 +75,12 @@ class RequestModel(Base):
         default=RequestStatus.pending,
     )
 
+    product: Mapped[ProductModel] = relationship(
+        "ProductModel", foreign_keys=product_id
+    )
     requested_by_user: Mapped[UserModel] = relationship(
-        back_populates="requests", foreign_keys=[requested_by_user_id]
+        "UserModel", foreign_keys=requested_by_user_id
     )
-    purchased_by_user: Mapped[UserModel] = relationship(
-        back_populates="purchases", foreign_keys=[purchased_by_user_id]
-    )
-    product: Mapped[ProductModel] = relationship(lazy="selectin")
 
 
 class ReceiptModel(Base):
@@ -102,10 +92,3 @@ class ReceiptModel(Base):
     image_url: Mapped[str | None]
     raw_model_response: Mapped[str | None]
     created_at: Mapped[datetime]
-
-    uploaded_by_user: Mapped[UserModel] = relationship(
-        UserModel, back_populates="receipts", foreign_keys=uploaded_by_user_id
-    )
-    store: Mapped[StoreModel] = relationship(
-        back_populates="receipts", foreign_keys=store_id
-    )

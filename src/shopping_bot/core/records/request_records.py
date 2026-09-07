@@ -15,13 +15,14 @@ class ResponseRequestRecord:
     requested_quantity: Decimal
     requested_at: datetime
     status: RequestStatus
-    user: ResponseUserRecord
-    product: ResponseProductRecord
-    purchased_by_user: ResponseUserRecord | None
-    receipt: ResponseReceiptRecord | None
+    requested_by_user_id: int
+    product_id: int
+    receipt_id: int | None
     price: Decimal | None
     quantity: Decimal | None
     match_confidence: int | None
+    product: ResponseProductRecord
+    requested_by_user: ResponseUserRecord
 
 
 @dataclass
@@ -34,8 +35,8 @@ class ResponseStoreRecord:
 @dataclass
 class ResponseReceiptRecord:
     id: int
-    store: ResponseStoreRecord
-    uploaded_by_user: ResponseUserRecord
+    store_id: int | None
+    uploaded_by_user_id: int
     receipt_date: datetime
     image_url: str | None
     raw_model_response: str | None

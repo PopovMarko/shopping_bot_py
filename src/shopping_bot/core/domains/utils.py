@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from shopping_bot.core.domains.product_domain import (
     ProductInputResult,
     ResponseProductDomain,
@@ -67,42 +65,39 @@ def to_response_user_domain(user: ResponseUserRecord) -> ResponseUserDomain:
 
 # TODO clear in "to_" function
 def to_request_domain(
-    result: RequestInputResult, request_record: ResponseRequestRecord, quantity: Decimal
+    result: RequestInputResult, request_record: ResponseRequestRecord
 ) -> ResultRequestDomain:
     return ResultRequestDomain(
-        result=result,
-        product=to_response_product_domain(request_record.product),
-        user=to_response_user_domain(request_record.user),
-        quantity=quantity,
-        requested_at=request_record.requested_at,
-        status=request_record.status,
+        result=result, request_domain=to_response_request_domain(request_record)
     )
 
 
 def to_response_request_domain(
-    response: ResponseRequestRecord,
+    request: ResponseRequestRecord,
 ) -> ResponseRequestDomain:
     return ResponseRequestDomain(
-        id=response.id,
-        product=to_response_product_domain(response.product),
-        requested_by_user=to_response_user_domain(response.user),
-        requested_quantity=response.requested_quantity,
-        requested_at=response.requested_at,
-        status=response.status,
+        id=request.id,
+        product_id=request.product_id,
+        requested_by_user_id=request.requested_by_user_id,
+        requested_quantity=request.requested_quantity,
+        requested_at=request.requested_at,
+        status=request.status,
+        product=to_response_product_domain(request.product),
+        requested_by_user=to_response_user_domain(request.requested_by_user),
     )
 
 
 def to_response_receipt_domain(
-    response: ResponseReceiptRecord,
+    receipt: ResponseReceiptRecord,
 ) -> ResponseReceiptDomain:
     return ResponseReceiptDomain(
-        id=response.id,
-        store_id=response.store,
-        uploaded_by_user_id=response.uploaded_by_user_id,
-        receipt_date=response.receipt_date,
-        image_url=response.image_url,
-        raw_model_response=response.raw_model_response,
-        created_at=response.created_at,
+        id=receipt.id,
+        store_id=receipt.store_id,
+        uploaded_by_user_id=receipt.uploaded_by_user_id,
+        receipt_date=receipt.receipt_date,
+        image_url=receipt.image_url,
+        raw_model_response=receipt.raw_model_response,
+        created_at=receipt.created_at,
     )
 
 

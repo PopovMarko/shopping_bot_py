@@ -1,9 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from shopping_bot.core.domains.request_domain import ResponseStoreDomain
-from shopping_bot.core.domains.user_domain import ResponseUserDomain
-
 
 @dataclass
 class InputStoreDomain:
@@ -13,8 +10,8 @@ class InputStoreDomain:
 
 @dataclass
 class InputReceiptDomain:
-    store: ResponseStoreDomain
-    uploaded_by_user: ResponseUserDomain
+    store_id: int | None
+    uploaded_by_user_id: int | None
     receipt_date: datetime
     image_url: str | None
     raw_model_response: str | None
@@ -24,16 +21,7 @@ class InputReceiptDomain:
 @dataclass
 class ResponseReceiptDomain:
     id: int
-    store_id: int
-    uploaded_by_user_id: int
-    receipt_date: datetime
-    image_url: str | None
-    raw_model_response: str | None
-
-
-@dataclass
-class InputReceiptDbDomain:
-    store_id: int
+    store_id: int | None
     uploaded_by_user_id: int
     receipt_date: datetime
     image_url: str | None

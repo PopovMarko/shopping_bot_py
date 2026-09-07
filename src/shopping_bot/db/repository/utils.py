@@ -40,18 +40,17 @@ def product_model_to_record(product: ProductModel) -> ResponseProductRecord:
 def request_model_to_record(request: RequestModel) -> ResponseRequestRecord:
     return ResponseRequestRecord(
         id=request.id,
-        product=product_model_to_record(request.product),
-        user=user_model_to_record(request.requested_by_user),
+        product_id=request.product_id,
+        requested_by_user_id=request.requested_by_user_id,
         requested_quantity=request.requested_quantity,
         requested_at=request.requested_at,
-        status=request.status,
-        purchased_by_user=user_model_to_record(request.purchased_by_user)
-        if request.purchased_by_user is not None
-        else None,
-        receipt=None,
+        receipt_id=request.receipt_id,
         price=request.price,
         quantity=request.quantity,
         match_confidence=request.match_confidence,
+        status=request.status,
+        product=product_model_to_record(request.product),
+        requested_by_user=user_model_to_record(request.requested_by_user),
     )
 
 
@@ -62,8 +61,8 @@ def store_model_to_record(store: StoreModel) -> ResponseStoreRecord:
 def receipt_model_to_record(receipt: ReceiptModel) -> ResponseReceiptRecord:
     return ResponseReceiptRecord(
         id=receipt.id,
-        store=store_model_to_record(receipt.store),
-        uploaded_by_user=user_model_to_record(receipt.uploaded_by_user),
+        store_id=receipt.store_id,
+        uploaded_by_user_id=receipt.uploaded_by_user_id,
         receipt_date=receipt.receipt_date,
         image_url=receipt.image_url,
         raw_model_response=receipt.raw_model_response,

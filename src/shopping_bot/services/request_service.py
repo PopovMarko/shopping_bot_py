@@ -35,9 +35,7 @@ class RequestService:
         try:
             quantity = Decimal(quantity_str)
         except InvalidOperation:
-            return ResultRequestDomain(
-                RequestInputResult.INVALID_QUANTITY,
-            )
+            return ResultRequestDomain(RequestInputResult.INVALID_QUANTITY, None)
         now = datetime.now()
 
         user_id = await self.user_service.get_user_id_by_telegram_id(telegram_user_id)
@@ -50,11 +48,10 @@ class RequestService:
                 requested_quantity=int(quantity),
                 requested_at=now,
                 status=RequestStatus.pending,
+                quantity=quantity,
             )
         )
-        return to_request_domain(
-            RequestInputResult.QUANTITY_ACCEPTED, request, quantity
-        )
+        return to_request_domain(RequestInputResult.QUANTITY_ACCEPTED, request)
 
     async def process_request_list(
         self, *args: RequestStatus

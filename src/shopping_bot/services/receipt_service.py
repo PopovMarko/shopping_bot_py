@@ -8,12 +8,12 @@ from pydantic import BaseModel
 
 from shopping_bot.core.domains.receipt_domain import (
     InputReceiptDomain,
-    InputStoreDomain,
 )
-from shopping_bot.core.domains.user_domain import InputUserDomain, ResponseUserDomain
+from shopping_bot.core.domains.request_domain import ResponseStoreDomain
+from shopping_bot.core.domains.user_domain import ResponseUserDomain
 from shopping_bot.core.domains.utils import (
     store_record_to_domain,
-    user_record_to_input_domain,
+    to_response_user_domain,
 )
 from shopping_bot.core.interfaces.repotsitory.request_repository_interface import (
     ReceiptRepositoryInterface,
@@ -21,12 +21,6 @@ from shopping_bot.core.interfaces.repotsitory.request_repository_interface impor
 from shopping_bot.core.interfaces.repotsitory.user_repository_interface import (
     UserRepositoryInterface,
 )
-from shopping_bot.core.records.request_records import ResponseStoreRecord
-from shopping_bot.handlers.utils import (
-    store_to_domain,
-    user_to_domain,
-)
-from shopping_bot.services.utils import input_receipt_to_db_domain
 
 log = logging.getLogger(__name__)
 
@@ -58,38 +52,40 @@ class ReceiptService:
         )
         raw_model_response = json_response
         # parse_receipt_to_json(receipt, product_name_list)
-        model_response = ModelResponse.model_validate_json(raw_model_response)
+        llm_model_response = ModelResponse.model_validate_json(raw_model_response)
         user_record = await self.user_repository.get_user_by_telegram_id(
             user_telegram_id
         )
         if user_record is None:
             raise ValueError("user is None in process_receipt")
-        user_input_domain = user_record_to_input_domain(user_record)
-        input_receipt_domain = llm_model_to_receipt_domain(
-            model_response, user_input_domain, raw_model_response
-        )
+        user_response_domain = to_response_user_domain(user_record)
         store_record = await self.repository.get_store_by_name_and_address(
-            input_receipt_domain.store
+            llm_model_response.store.name, llm_model_response.store.address
         )
         if store_record is None:
             store_record = await self.repository.create_store(
-                input_receipt_domain.store
+                llm_model_response.store.name, llm_model_response.store.address
             )
         store_domain = store_record_to_domain(store_record)
-        input_db_receipt_domain = input_receipt_to_db_domain(input_receipt_domain)
+        input_receipt_domain = llm_model_to_receipt_domain(
+            llm_model_response, user_response_domain, raw_model_response, store_domain
+        )
 
-        await self.repository.create_receipt(input_db_receipt_domain)
+        await self.repository.create_receipt(input_receipt_domain)
 
 
 def llm_model_to_receipt_domain(
-    model_response: ModelResponse, user: InputUserDomain, raw_nodel_response: str
+    model_response: ModelResponse,
+    user: ResponseUserDomain,
+    raw_model_response: str,
+    store: ResponseStoreDomain,
 ) -> InputReceiptDomain:
     return InputReceiptDomain(
-        store=store_to_domain(model_response.store),
-        uploaded_by_user=user,
+        store_id=store.id,
+        uploaded_by_user_id=user.id,
         receipt_date=model_response.receipt_date,
         image_url=None,
-        raw_model_response=raw_nodel_response,
+        raw_model_response=raw_model_response,
         created_at=datetime.now(),
     )
 
