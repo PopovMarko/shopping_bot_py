@@ -7,12 +7,6 @@ from decimal import Decimal
 
 from pydantic import BaseModel
 
-from shopping_bot.core.domains.receipt_domain import (
-    InputReceiptDomain,
-)
-from shopping_bot.core.domains.request_domain import ResponseStoreDomain
-from shopping_bot.core.domains.user_domain import ResponseUserDomain
-
 
 def parse_product_input(text: str) -> dict[str, str | None]:
     raw_parts = re.split(r"[,:\s]+", text.strip())
@@ -45,25 +39,11 @@ def parse_product_input(text: str) -> dict[str, str | None]:
     return {"name": name, "quantity": quantity, "unit": unit}
 
 
-def parse_receipt_to_json(receipt, product_name_list: list[str]) -> str:
+def parse_receipt_to_json(
+    img_bytes_64: bytes, product_name_list: list[str], prompt: str
+) -> str:
     # Request LLM to parse receipt and return json
     return ""
-
-
-def llm_model_to_receipt_domain(
-    model_response: ModelResponse,
-    user: ResponseUserDomain,
-    raw_model_response: str,
-    store: ResponseStoreDomain,
-) -> InputReceiptDomain:
-    return InputReceiptDomain(
-        store_id=store.id,
-        uploaded_by_user_id=user.id,
-        receipt_date=model_response.receipt_date,
-        image_url=None,
-        raw_model_response=raw_model_response,
-        created_at=datetime.now(),
-    )
 
 
 @dataclass
@@ -87,36 +67,16 @@ class ModelResponse(BaseModel):
     store: Store
     uploaded_by_user_id: int | None = 1
     receipt_date: datetime
-    total_ammount: Decimal
+    total_amount: Decimal
     product: list[Product]
 
 
-json_response = """ 
-{"store": {"name": "silpo", "address": " "}, "receipt_date": "2026-12-13", "total_ammount": "1250", "product": [{"name": "milk", "price": "33.23", "quantity": "2.5", "match_confidence": "100"}, {"name": "молоко", "price": "139", "quantity": "2.0", "match_confidence": "100"}]}
+prompt = """
 
 """
-# json_response = """
-# {
-#    "store": {
-#        "name": "silpo",
-#        "address": " "
-#    },
-#    "receipt_date": "2026-12-13",
-#    "total_ammount": "1250"
-#    "requests": [
-#            {
-#            "name": "milk"
-#            "price": "33.23",
-#            "quantity": "2.5",
-#            "match_confidence": "100"
-#        },
-#            {
-#            "name": "молоко"
-#            "price": "139",
-#            "quantity": "2.0",
-#            "match_confidence": "100"
-#        }
-#    ]
-# }
-#
-# """
+
+
+json_response = """ 
+{"store": {"name": "silpo", "address": " "}, "receipt_date": "2026-12-13", "total_amount": "1250", "product": [{"name": "milk", "price": "33.23", "quantity": "2.5", "match_confidence": "100"}, {"name": "молоко", "price": "139", "quantity": "2.0", "match_confidence": "100"}]}
+
+"""

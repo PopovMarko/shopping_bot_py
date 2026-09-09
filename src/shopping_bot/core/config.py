@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     log_level: str = "DEBUG"
     fuzzy_match_threshold: int = 85
     fuzzy_confirm_threshold: int = 50
+    model: str
+    max_tokens: int = 1024
 
     model_config = SettingsConfigDict(toml_file=_CONFIG_PATH, extra="ignore")
 

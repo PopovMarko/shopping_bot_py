@@ -55,7 +55,7 @@ class ReceiptRepository:
     async def get_store_by_name_and_address(
         self,
         name: str,
-        address: str,
+        address: str | None,
     ) -> ResponseStoreRecord | None:
         async with async_session_factory() as session:
             res = await session.execute(
@@ -68,10 +68,14 @@ class ReceiptRepository:
                 return None
             return store_model_to_record(store_model)
 
-    async def create_store(self, name: str, address: str) -> ResponseStoreRecord:
+    async def create_store(self, name: str, address: str | None) -> ResponseStoreRecord:
+        values: dict[str, str] = {}
+        values["name"] = name
+        if address is not None:
+            values["address"] = address
         async with async_session_factory() as session:
             res = await session.execute(
-                insert(StoreModel).values(name, address).returning(StoreModel)
+                insert(StoreModel).values(values).returning(StoreModel)
             )
             await session.commit()
             store_model = res.scalar_one()

@@ -12,7 +12,7 @@ class InputStoreDomain:
 
 
 @dataclass
-class InputReceiptDomain:
+class Try_InputReceiptDomain:
     store_id: int | None
     uploaded_by_user_id: int | None
     receipt_date: datetime
@@ -33,13 +33,15 @@ class ResponseReceiptDomain:
 
 
 @dataclass
-class Try_Input_Receipt_Domain:
+class InputReceiptDomain:
     id: int
     receipt_id: int
     price: Decimal
     quantity: Decimal
     match_confidence: int
     status: RequestStatus
-    store_id: int
-    uploaded_by_user_id: int
+    store_id: int | None
+    uploaded_by_user_id: int | None
+    image_url: str | None
     raw_model_response: str | None
+    created_at: datetime

@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import logging
 
+from anthropic import AsyncAnthropic
 from pydantic import TypeAdapter
 
+from shopping_bot.core.config import Settings
 from shopping_bot.core.domains.request_domain import (
     ResponseRequestDomain,
 )
@@ -17,13 +19,13 @@ from shopping_bot.core.interfaces.repotsitory.request_repository_interface impor
 from shopping_bot.core.interfaces.repotsitory.user_repository_interface import (
     UserRepositoryInterface,
 )
-from shopping_bot.services.utils import (
-    ModelResponse,
-    Product,
-    Store,
-    json_response,
-    llm_model_to_receipt_domain,
+from shopping_bot.services.anthropic import (
+    messages_builder,
+    system,
+    tool_choice,
+    tools,
 )
+from shopping_bot.services.utils import ModelResponse
 
 log = logging.getLogger(__name__)
 
@@ -33,9 +35,11 @@ class ReceiptService:
         self,
         repository: ReceiptRepositoryInterface,
         user_repository: UserRepositoryInterface,
+        anthropic_client: AsyncAnthropic,
     ) -> None:
         self.repository = repository
         self.user_repository = user_repository
+        self.client = anthropic_client
 
     async def process_request_id_to_product_name(
         self,
@@ -49,17 +53,33 @@ class ReceiptService:
 
     async def process_receipt(
         self,
-        receipt,
+        img_bytes_64: str,
         user_telegram_id: int,
         request_domain_list: list[ResponseRequestDomain],
     ) -> None:
+        settings = Settings()
         product_name_list = [r.product.name for r in request_domain_list]
+        messages = messages_builder(img_bytes_64, product_name_list)
 
-        raw_model_response = json_response
-        # parse_receipt_to_json(receipt, product_name_list)
+        raw_model_response = await self.client.messages.create(
+            model=settings.model,
+            max_tokens=settings.max_tokens,
+            messages=messages,
+            system=system,
+            tools=tools,
+            tool_choice=tool_choice,
+        )
+        model_block = next(
+            block for block in raw_model_response.content if block.type == "tool_use"
+        )
+
+        model_response_dict = model_block.input
+
+        log.debug(f"model_response_dict {model_response_dict}")
+
         adapter = TypeAdapter(ModelResponse)
-        llm_model_response = adapter.validate_json(
-            raw_model_response, strict=False, by_name=True
+        llm_model_response = adapter.validate_python(
+            model_response_dict, strict=False, by_name=True
         )
 
         user_record = await self.user_repository.get_user_by_telegram_id(

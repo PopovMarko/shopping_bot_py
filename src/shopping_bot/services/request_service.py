@@ -45,9 +45,10 @@ class RequestService:
             InputRequestDomain(
                 product_id=product_id,
                 requested_by_user_id=user_id,
-                requested_quantity=int(quantity),
+                requested_quantity=Decimal(quantity),
                 requested_at=now,
                 status=RequestStatus.pending,
+                price=None,
                 quantity=quantity,
             )
         )

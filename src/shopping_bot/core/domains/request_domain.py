@@ -25,9 +25,10 @@ class ResultRequestDomain:
 class InputRequestDomain:
     product_id: int
     requested_by_user_id: int
-    requested_quantity: int
+    requested_quantity: Decimal
     requested_at: datetime
     quantity: Decimal | None
+    price: Decimal | None
     status: RequestStatus | None = None
 
 

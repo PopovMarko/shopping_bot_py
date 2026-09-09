@@ -8,6 +8,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.strategy import FSMStrategy
+from anthropic import AsyncAnthropic, AsyncClient
 from dotenv import load_dotenv
 
 from shopping_bot.core.config import Settings
@@ -28,6 +29,8 @@ load_dotenv()
 settings = Settings()
 
 TOKEN = str(os.getenv("SHOPPING_BOT_TOKEN"))
+CLAUDE_API_KEY = str(os.getenv("SHOPPING_BOT_CLAUDE_API_KEY"))
+
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(
     FSMStrategy=FSMStrategy.GLOBAL_USER,
@@ -35,6 +38,8 @@ dp = Dispatcher(
 dp.include_router(router)
 dp.include_router(product_router)
 dp.include_router(store_router)
+
+anthropic_client = AsyncAnthropic(api_key=CLAUDE_API_KEY)
 
 configure_logger(settings.log_level)
 log = logging.getLogger(__name__)
@@ -55,7 +60,7 @@ request_service = RequestService(request_repository, user_service)
 log.debug("Initialised Request repository and service")
 
 receipt_repository = ReceiptRepository()
-receipt_service = ReceiptService(receipt_repository, user_repository)
+receipt_service = ReceiptService(receipt_repository, user_repository, anthropic_client)
 log.debug("Intialised Receipt repository and service")
 
 
@@ -66,6 +71,7 @@ async def main():
         product_controller=product_service,
         request_controller=request_service,
         receipt_controller=receipt_service,
+        anthropic_client=anthropic_client,
     )
 
 
