@@ -37,7 +37,7 @@ async def add_product(message: Message, state: FSMContext, bot: Bot) -> None:
 
     await state.set_state(WaitFor.product)
     await message.answer(
-        "Введите название продукта:", reply_markup=get_cancel_keyboard()
+        "Введите название продукта:", reply_markup=get_cancel_keyboard("Хватит")
     )
 
 

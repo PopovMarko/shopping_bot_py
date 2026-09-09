@@ -61,9 +61,6 @@ class RequestModel(Base):
     requested_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     requested_quantity: Mapped[Decimal]
     requested_at: Mapped[datetime]
-    purchased_by_user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=True
-    )
     receipt_id: Mapped[int | None] = mapped_column(
         ForeignKey("receipts.id"), nullable=True
     )

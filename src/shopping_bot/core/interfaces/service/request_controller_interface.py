@@ -22,5 +22,8 @@ class RequestControllerInterface(Protocol):
 
 class ReceiptControllerInterface(Protocol):
     async def process_receipt(
-        self, receipt, user_telegram_id: int, requect_id_list: list[int]
+        self,
+        receipt,
+        user_telegram_id: int,
+        request_domain_list: list[ResponseRequestDomain],
     ) -> None: ...

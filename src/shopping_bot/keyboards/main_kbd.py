@@ -1,4 +1,3 @@
-from aiogram.filters import callback_data
 from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import (
     InlineKeyboardBuilder,
@@ -18,9 +17,9 @@ def get_main_keyboard() -> ReplyKeyboardMarkup:
     return builder.as_markup(resize_keyboard=True)
 
 
-def get_cancel_keyboard() -> ReplyKeyboardMarkup:
+def get_cancel_keyboard(text: str) -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
-    builder.button(text="Хватит")
+    builder.button(text=text)
     builder.adjust(1)
 
     return builder.as_markup(resize_keyboard=True, one_time_keyboard=True)

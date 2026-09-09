@@ -73,7 +73,8 @@ async def parse_request_response(
         case RequestInputResult.QUANTITY_ACCEPTED:
             await state.set_state(WaitFor.product)
             await message.answer(
-                "Enter next product or End to quit", reply_markup=get_cancel_keyboard()
+                "Enter next product or End to quit",
+                reply_markup=get_cancel_keyboard("Хватит"),
             )
         case RequestInputResult.INVALID_QUANTITY:
             await message.answer("Enter correct quantity")

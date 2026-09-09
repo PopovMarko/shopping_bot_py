@@ -1,33 +1,46 @@
-from dataclasses import asdict
+from datetime import datetime
 from typing import cast
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 
-from shopping_bot.core.domains.receipt_domain import (
-    InputReceiptDomain,
-)
 from shopping_bot.core.records.request_records import (
     ResponseReceiptRecord,
     ResponseStoreRecord,
 )
+from shopping_bot.core.records.utils import RequestStatus
 from shopping_bot.db.models import ProductModel, ReceiptModel, RequestModel, StoreModel
 from shopping_bot.db.postgres.engine import async_session_factory
 from shopping_bot.db.repository.utils import (
     receipt_model_to_record,
     store_model_to_record,
 )
+from shopping_bot.services.utils import ModelResponse
 
 
 class ReceiptRepository:
-    async def create_receipt(
-        self, receipt: InputReceiptDomain
-    ) -> ResponseReceiptRecord:
+    async def create_receipt(self, receipt: ModelResponse) -> ResponseReceiptRecord:
+        request_id_list = []
+        for r in receipt.product:
+            request_id_list.append(r.id)
         async with async_session_factory() as session:
             res = await session.execute(
-                insert(ReceiptModel).values(**asdict(receipt)).returning(ReceiptModel)
+                insert(ReceiptModel)
+                .values(
+                    store_id=receipt.store.id,
+                    uploaded_by_user_id=receipt.uploaded_by_user_id,
+                    receipt_date=receipt.receipt_date,
+                    raw_model_response=None,
+                    created_at=datetime.now(),
+                )
+                .returning(ReceiptModel)
+            )
+            receipt_model = res.scalar_one()
+            await session.execute(
+                update(RequestModel)
+                .values(receipt_id=receipt_model.id, status=RequestStatus.fulfilled)
+                .where(RequestModel.id.in_(request_id_list))
             )
             await session.commit()
-            receipt_model = res.scalar_one()
             return receipt_model_to_record(receipt_model)
 
     async def get_product_name_list(self, request_id_list: list[int]) -> list[str]:

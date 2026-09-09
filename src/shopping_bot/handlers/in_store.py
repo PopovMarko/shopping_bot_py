@@ -4,14 +4,13 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from shopping_bot.core.domains.request_domain import ResponseRequestDomain
 from shopping_bot.core.interfaces.service.request_controller_interface import (
     RequestControllerInterface,
 )
 from shopping_bot.core.records.utils import RequestStatus
 from shopping_bot.handlers.add_receipt import receipt_router
 from shopping_bot.keyboards.in_store_kbd import get_inline_product_list_keyboard
-from shopping_bot.keyboards.main_kbd import get_main_keyboard
+from shopping_bot.keyboards.main_kbd import get_cancel_keyboard, get_main_keyboard
 from shopping_bot.states.user_states import WaitFor
 
 log = logging.getLogger(__name__)
@@ -54,21 +53,11 @@ async def request_in_cart_and_back(
     request_domain_list = await request_controller.process_request_in_cart_and_back(
         request_id
     )
-    request_id_list = request_list_to_request_id_list(request_domain_list)
-    await state.update_data(request_id_list=request_id_list)
+    await state.update_data(request_domain_list=request_domain_list)
     if isinstance(callback_query.message, Message):
         await callback_query.message.edit_reply_markup(
             reply_markup=get_inline_product_list_keyboard(request_domain_list)
         )
-
-
-def request_list_to_request_id_list(
-    domain_list: list[ResponseRequestDomain],
-) -> list[int]:
-    id_list = []
-    for r in domain_list:
-        id_list.append(r.id)
-    return id_list
 
 
 @store_router.callback_query(F.data == "stop")
@@ -83,12 +72,21 @@ async def end_of_shopping(
     request_domain_list = await request_controller.process_request_list(
         RequestStatus.in_cart
     )
-    request_id_list = request_list_to_request_id_list(request_domain_list)
-    await state.update_data(request_id_list=request_id_list)
+    await state.update_data(request_domain_list=request_domain_list)
     if callback_query.message is not None:
         await callback_query.message.answer(
-            "Покупки закончены. Сфотографируйте чек или экран кассы самообслуживания",
-            reply_markup=get_main_keyboard(),
+            "Покупки закончены. Сфотографируйте чек или экран кассы самообслуживания. Или нажмите кнопку",
+            reply_markup=get_cancel_keyboard("Без чека"),
         )
     await state.set_state(WaitFor.receipt)
     await callback_query.answer()
+
+
+@store_router.message(WaitFor.receipt, F.text == "Без чека")
+async def end_of_shopping_without_receipt(message: Message, state: FSMContext) -> None:
+    log.debug("handele without receipt")
+
+    # TODO process with empty receipt
+
+    await state.clear()
+    await message.answer("Покупка закрыта без чека", reply_markup=get_main_keyboard())

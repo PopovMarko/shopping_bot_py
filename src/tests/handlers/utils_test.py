@@ -75,7 +75,8 @@ async def test_parse_product_response(
         case RequestInputResult.QUANTITY_ACCEPTED:
             mock_state.set_state.assert_awaited_once_with(WaitFor.product)
             mock_message.answer.assert_awaited_once_with(
-                "Enter next product or End to quit", reply_markup=get_cancel_keyboard()
+                "Enter next product or End to quit",
+                reply_markup=get_cancel_keyboard("Хватит"),
             )
         case RequestInputResult.INVALID_QUANTITY:
             mock_message.answer.assert_awaited_once_with("Enter correct quantity")

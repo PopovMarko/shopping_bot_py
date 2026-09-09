@@ -23,7 +23,7 @@ async def test_add_product(
 
     if chat_type != "group":
         mock_message.answer.assert_awaited_once_with(
-            "Введите название продукта:", reply_markup=get_cancel_keyboard()
+            "Введите название продукта:", reply_markup=get_cancel_keyboard("Хватит")
         )
         mock_state.set_state.assert_awaited_once_with(WaitFor.product)
         mock_bot.get_me.assert_not_awaited()
@@ -49,7 +49,7 @@ async def test_process_add_product(
             mock_state.set_state.assert_awaited_once_with(WaitFor.product)
         case None:
             mock_message.answer.assert_awaited_once_with(
-                "Введите название продукта:", reply_markup=get_cancel_keyboard()
+                "Введите название продукта:", reply_markup=get_cancel_keyboard("Хватит")
             )
 
 

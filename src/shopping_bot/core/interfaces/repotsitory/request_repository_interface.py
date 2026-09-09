@@ -12,6 +12,7 @@ from shopping_bot.core.records.request_records import (
     ResponseStoreRecord,
 )
 from shopping_bot.core.records.utils import RequestStatus
+from shopping_bot.services.utils import ModelResponse
 
 
 class RequestRepositoryInterface(Protocol):
@@ -31,17 +32,17 @@ class RequestRepositoryInterface(Protocol):
 
 
 class ReceiptRepositoryInterface(Protocol):
-    async def create_receipt(
-        self, receipt: InputReceiptDomain
-    ) -> ResponseReceiptRecord: ...
+    async def create_receipt(self, receipt: ModelResponse) -> ResponseReceiptRecord: ...
 
     async def get_product_name_list(self, request_id_list: list[int]) -> list[str]: ...
 
     async def get_store_by_name_and_address(
         self,
         name: str,
-        address: str,
+        address: str | None,
     ) -> ResponseStoreRecord | None: ...
 
-    async def create_store(self, name: str, address: str) -> ResponseStoreRecord: ...
+    async def create_store(
+        self, name: str, address: str | None
+    ) -> ResponseStoreRecord: ...
     async def update_receipt(self) -> None: ...
