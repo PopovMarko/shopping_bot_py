@@ -66,9 +66,7 @@ tools: Iterable[ToolUnionParam] = [
                             "description": "Address of the store. City and street",
                         },
                     },
-                    "required": [
-                        "name",
-                    ],
+                    "required": [],
                 },
                 "receipt_date": {"type": "string"},
                 "total_amount": {"type": "string"},
@@ -91,11 +89,11 @@ tools: Iterable[ToolUnionParam] = [
                             "match_confidence": {
                                 "type": "string",
                                 "description": """
-                                                 Mark your confidence in name conversion in percent
+                                                 Mark your confidence in name conversion in percent without percent mark at the end
                                                  """,
                             },
                         },
-                        "required": ["name", "price", "quantity", "match_confidence"],
+                        "required": ["name", "address"],
                     },
                 },
             },

@@ -30,10 +30,10 @@ async def add_receipt_photo(
         raise ValueError()
     photo_size = message.photo[-1]
     file = await bot.get_file(photo_size.file_id)
-    bytes_io_reader = await bot.download(file)
-    if bytes_io_reader is None:
+    file_io_reader = await bot.download(file)
+    if file_io_reader is None:
         raise ValueError("Failed to download file")
-    img_bytes = bytes_io_reader.read()
+    img_bytes = file_io_reader.read()
     img_bytes_64 = base64.standard_b64encode(img_bytes).decode("utf-8")
 
     request_domain_list = cast(

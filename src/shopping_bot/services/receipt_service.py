@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
+from decimal import Decimal
 
 from anthropic import AsyncAnthropic
 from pydantic import TypeAdapter
@@ -25,7 +27,7 @@ from shopping_bot.services.anthropic import (
     tool_choice,
     tools,
 )
-from shopping_bot.services.utils import ModelResponse
+from shopping_bot.services.utils import ModelResponse, Product, Store
 
 log = logging.getLogger(__name__)
 
@@ -107,8 +109,37 @@ class ReceiptService:
                 if r.product.name == p.name:
                     p.id = r.id
 
-        # input_receipt_domain = llm_model_to_receipt_domain(
-        #     llm_model_response, user_response_domain, raw_model_response, store_domain
-        # )
+        log.debug(llm_model_response)
 
         await self.repository.create_receipt(llm_model_response)
+
+    async def process_empty_receipt(
+        self,
+        user_telegram_id: int,
+        request_domain_list: list[ResponseRequestDomain],
+    ):
+        user_record = await self.user_repository.get_user_by_telegram_id(
+            user_telegram_id
+        )
+        if user_record is None:
+            raise ValueError("user is None in process_receipt")
+        user_response_domain = to_response_user_domain(user_record)
+
+        product_list = [
+            Product(
+                id=r.id,
+                name=r.product.name,
+                price=None,
+                quantity=None,
+                match_confidence=None,
+            )
+            for r in request_domain_list
+        ]
+        receipt = ModelResponse(
+            store=Store(id=None, name=None, address=None),
+            uploaded_by_user_id=user_response_domain.id,
+            receipt_date=datetime.now(),
+            total_amount=Decimal(0),
+            product=product_list,
+        )
+        await self.repository.create_receipt(receipt)

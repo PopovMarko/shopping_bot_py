@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import cast
+from typing import Any, cast
 
 from sqlalchemy import insert, select, update
 
@@ -35,11 +35,20 @@ class ReceiptRepository:
                 .returning(ReceiptModel)
             )
             receipt_model = res.scalar_one()
-            await session.execute(
-                update(RequestModel)
-                .values(receipt_id=receipt_model.id, status=RequestStatus.fulfilled)
-                .where(RequestModel.id.in_(request_id_list))
-            )
+
+            data_to_update: list[dict[str, Any]] = []
+            for p in receipt.product:
+                data_to_update.append(
+                    {
+                        "id": p.id,
+                        "receipt_id": receipt_model.id,
+                        "price": p.price,
+                        "quantity": p.quantity,
+                        "match_confidence": p.match_confidence,
+                        "status": RequestStatus.fulfilled,
+                    }
+                )
+            await session.execute(update(RequestModel), data_to_update)
             await session.commit()
             return receipt_model_to_record(receipt_model)
 

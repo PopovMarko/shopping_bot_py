@@ -1,7 +1,5 @@
 log_level = "DEBUG"
-
 fuzzy_match_threshold = 85
 fuzzy_confirm_threshold = 50
-
 model = "claude-sonnet-4-6"
 max_tokens = 1024

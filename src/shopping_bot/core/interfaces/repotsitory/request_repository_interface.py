@@ -1,8 +1,5 @@
 from typing import Protocol
 
-from shopping_bot.core.domains.receipt_domain import (
-    InputReceiptDomain,
-)
 from shopping_bot.core.domains.request_domain import (
     InputRequestDomain,
 )
@@ -38,11 +35,11 @@ class ReceiptRepositoryInterface(Protocol):
 
     async def get_store_by_name_and_address(
         self,
-        name: str,
+        name: str | None,
         address: str | None,
     ) -> ResponseStoreRecord | None: ...
 
     async def create_store(
-        self, name: str, address: str | None
+        self, name: str | None, address: str | None
     ) -> ResponseStoreRecord: ...
     async def update_receipt(self) -> None: ...

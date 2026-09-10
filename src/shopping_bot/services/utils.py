@@ -48,35 +48,24 @@ def parse_receipt_to_json(
 
 @dataclass
 class Store(BaseModel):
-    id: int | None = 1
-    name: str
+    id: int | None = 0
+    name: str | None
     address: str | None
 
 
 @dataclass
 class Product(BaseModel):
-    id: int = 1  # ID of the Request !
+    id: int = 0  # ID of the Request !
     name: str
-    price: Decimal
-    quantity: Decimal
-    match_confidence: int
+    price: Decimal | None
+    quantity: Decimal | None
+    match_confidence: int | None
 
 
 @dataclass
 class ModelResponse(BaseModel):
     store: Store
-    uploaded_by_user_id: int | None = 1
+    uploaded_by_user_id: int | None = 0
     receipt_date: datetime
     total_amount: Decimal
     product: list[Product]
-
-
-prompt = """
-
-"""
-
-
-json_response = """ 
-{"store": {"name": "silpo", "address": " "}, "receipt_date": "2026-12-13", "total_amount": "1250", "product": [{"name": "milk", "price": "33.23", "quantity": "2.5", "match_confidence": "100"}, {"name": "молоко", "price": "139", "quantity": "2.0", "match_confidence": "100"}]}
-
-"""

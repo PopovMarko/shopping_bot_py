@@ -4,7 +4,9 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
+from shopping_bot.core.interfaces.service import request_controller_interface
 from shopping_bot.core.interfaces.service.request_controller_interface import (
+    ReceiptControllerInterface,
     RequestControllerInterface,
 )
 from shopping_bot.core.records.utils import RequestStatus
@@ -83,10 +85,15 @@ async def end_of_shopping(
 
 
 @store_router.message(WaitFor.receipt, F.text == "Без чека")
-async def end_of_shopping_without_receipt(message: Message, state: FSMContext) -> None:
+async def end_of_shopping_without_receipt(
+    message: Message, state: FSMContext, receipt_controller: ReceiptControllerInterface
+) -> None:
     log.debug("handele without receipt")
-
-    # TODO process with empty receipt
-
+    request_domain_list = await state.get_value("request_domain_list")
+    if message.from_user is None or request_domain_list is None:
+        raise ValueError()
+    await receipt_controller.process_empty_receipt(
+        message.from_user.id, request_domain_list
+    )
     await state.clear()
     await message.answer("Покупка закрыта без чека", reply_markup=get_main_keyboard())
