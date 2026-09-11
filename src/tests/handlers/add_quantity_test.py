@@ -47,6 +47,8 @@ async def test_list_request(
     res = [
         ResponseRequestDomain(
             id=1,
+            product_id=1,
+            requested_by_user_id=1,
             requested_quantity=Decimal(10),
             requested_at=now,
             status=RequestStatus.pending,
@@ -54,7 +56,9 @@ async def test_list_request(
             product=mock_response,
         ),
         ResponseRequestDomain(
-            id=1,
+            id=2,
+            product_id=2,
+            requested_by_user_id=2,
             requested_quantity=Decimal(10),
             requested_at=now,
             status=RequestStatus.pending,

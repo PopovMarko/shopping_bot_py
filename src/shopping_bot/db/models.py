@@ -83,7 +83,7 @@ class RequestModel(Base):
 class ReceiptModel(Base):
     __tablename__ = "receipts"
     id: Mapped[int] = mapped_column(primary_key=True)
-    store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
+    store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"), nullable=True)
     uploaded_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     receipt_date: Mapped[datetime]
     image_url: Mapped[str | None]

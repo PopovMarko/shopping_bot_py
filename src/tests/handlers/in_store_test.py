@@ -19,6 +19,8 @@ async def test_in_store(
     mock_response = [
         ResponseRequestDomain(
             id=1,
+            product_id=1,
+            requested_by_user_id=1,
             requested_quantity=Decimal(10),
             requested_at=now,
             status=RequestStatus.pending,
@@ -27,6 +29,8 @@ async def test_in_store(
         ),
         ResponseRequestDomain(
             id=2,
+            product_id=2,
+            requested_by_user_id=1,
             requested_quantity=Decimal(15),
             requested_at=now,
             status=RequestStatus.pending,
@@ -56,6 +60,8 @@ async def test_request_in_cart_and_back(
     request_domain_list = [
         ResponseRequestDomain(
             id=1,
+            product_id=1,
+            requested_by_user_id=1,
             requested_quantity=Decimal(10),
             requested_at=now,
             status=RequestStatus.pending,
@@ -64,7 +70,9 @@ async def test_request_in_cart_and_back(
         ),
         ResponseRequestDomain(
             id=2,
-            requested_quantity=Decimal(10),
+            product_id=2,
+            requested_by_user_id=2,
+            requested_quantity=Decimal(15),
             requested_at=now,
             status=RequestStatus.pending,
             requested_by_user=mock_user,

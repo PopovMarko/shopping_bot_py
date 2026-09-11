@@ -31,7 +31,7 @@ def mock_product_repository_factory():
     ):
         repository = MagicMock()
         repository.get_products = AsyncMock()
-        repository.get_uproducts.return_value = products_response
+        repository.get_products.return_value = products_response
 
         repository.get_product = AsyncMock()
         repository.get_product.return_value = product_response

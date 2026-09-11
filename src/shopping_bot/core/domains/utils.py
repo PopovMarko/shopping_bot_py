@@ -63,7 +63,6 @@ def to_response_user_domain(user: ResponseUserRecord) -> ResponseUserDomain:
     )
 
 
-# TODO clear in "to_" function
 def to_request_domain(
     result: RequestInputResult, request_record: ResponseRequestRecord
 ) -> ResultRequestDomain:

@@ -45,5 +45,8 @@ async def request_list(
     request_list = await request_controller.process_request_list(
         RequestStatus.in_cart, RequestStatus.pending
     )
+    if len(request_list) == 0:
+        await message.answer("Список пуст. Добавте товары")
+        return
     text_message: str = list_response_request_domain_to_string(request_list)
     await message.answer(text_message)

@@ -59,17 +59,6 @@ async def process_add_product(
     await parse_product_response(message, state, response)
 
 
-# @product_router.callback_query(WaitFor.product)
-# async def process_cancel_add_product(
-#     update: Update, state: FSMContext, product_controller: ProductControllerInterface
-# ) -> None:
-#     if update.callback_query is None:
-#         raise ValueError("Callback query is None")
-#     query = update.callback_query
-#     query.answer()
-#     await state.clear()
-
-
 @product_router.message(WaitFor.confirmation, F.text.casefold().in_({"yes", "no"}))
 async def process_confirm_product(
     message: Message, state: FSMContext, product_controller: ProductControllerInterface
