@@ -21,6 +21,12 @@ from shopping_bot.core.interfaces.repotsitory.request_repository_interface impor
 from shopping_bot.core.interfaces.repotsitory.user_repository_interface import (
     UserRepositoryInterface,
 )
+from shopping_bot.core.interfaces.service.product_controller_interface import (
+    ProductControllerInterface,
+)
+from shopping_bot.core.interfaces.service.request_controller_interface import (
+    RequestControllerInterface,
+)
 from shopping_bot.services.anthropic import (
     messages_builder,
     system,
@@ -38,10 +44,14 @@ class ReceiptService:
         repository: ReceiptRepositoryInterface,
         user_repository: UserRepositoryInterface,
         anthropic_client: AsyncAnthropic,
+        product_service: ProductControllerInterface,
+        request_service: RequestControllerInterface,
     ) -> None:
         self.repository = repository
         self.user_repository = user_repository
         self.client = anthropic_client
+        self.product_controller = product_service
+        self.request_controller = request_service
 
     async def process_request_id_to_product_name(
         self,
@@ -104,11 +114,21 @@ class ReceiptService:
         llm_model_response.store.name = store_domain.name
         llm_model_response.store.address = store_domain.address
 
-        for r in request_domain_list:
-            for p in llm_model_response.product:
+        for p in llm_model_response.product:
+            for r in request_domain_list:
                 if r.product.name == p.name:
                     p.id = r.id
+                    continue
+            product_from_receipt = (
+                await self.product_controller.process_product_from_receipt(p.name)
+            )
+            if product_from_receipt is None or user_response_domain.id is None:
+                raise ValueError()
+            request_domain = await self.request_controller.process_request_from_receipt(
+                product_from_receipt, user_response_domain.id, p.quantity
+            )
 
+            p.id = request_domain.id
         log.debug(llm_model_response)
 
         await self.repository.create_receipt(llm_model_response)

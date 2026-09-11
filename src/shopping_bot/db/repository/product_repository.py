@@ -1,6 +1,6 @@
 from dataclasses import asdict
 
-from sqlalchemy import insert, select
+from sqlalchemy import func, insert, select
 
 from shopping_bot.core.domains.product_domain import InputProductDomain
 from shopping_bot.core.records.product_records import ResponseProductRecord
@@ -45,4 +45,17 @@ class ProductRepository:
             )
             await session.commit()
             product_model = res.scalar_one()
+            return product_model_to_record(product_model)
+
+    async def get_similar_product(self, name: str) -> ResponseProductRecord | None:
+        async with async_session_factory() as session:
+            res = await session.execute(
+                select(ProductModel)
+                .order_by(func.similarity(ProductModel.name, name).desc())
+                .limit(1)
+            )
+
+            product_model = res.scalar_one_or_none()
+            if product_model is None:
+                return None
             return product_model_to_record(product_model)

@@ -1,6 +1,9 @@
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
+from shopping_bot.core.domains.product_domain import (
+    ResponseProductDomain,
+)
 from shopping_bot.core.domains.request_domain import (
     InputRequestDomain,
     RequestInputResult,
@@ -79,3 +82,22 @@ class RequestService:
         return await self.process_request_list(
             RequestStatus.pending, RequestStatus.in_cart
         )
+
+    async def process_request_from_receipt(
+        self,
+        product: ResponseProductDomain,
+        requested_by_user_id: int,
+        quantity: Decimal | None,
+    ) -> ResponseRequestDomain:
+        now = datetime.now()
+        request = InputRequestDomain(
+            product_id=product.id if product.id is not None else 0,
+            requested_by_user_id=requested_by_user_id,
+            requested_quantity=quantity if quantity is not None else Decimal(0),
+            requested_at=now,
+            quantity=None,
+            price=None,
+            status=RequestStatus.fulfilled,
+        )
+        request = await self.repository.create_request(request)
+        return to_response_request_domain(request)

@@ -60,7 +60,13 @@ request_service = RequestService(request_repository, user_service)
 log.debug("Initialised Request repository and service")
 
 receipt_repository = ReceiptRepository()
-receipt_service = ReceiptService(receipt_repository, user_repository, anthropic_client)
+receipt_service = ReceiptService(
+    receipt_repository,
+    user_repository,
+    anthropic_client,
+    product_service,
+    request_service,
+)
 log.debug("Intialised Receipt repository and service")
 
 

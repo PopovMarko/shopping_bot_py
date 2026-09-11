@@ -6,9 +6,10 @@ from shopping_bot.core.config import Settings
 from shopping_bot.core.domains.product_domain import (
     InputProductDomain,
     ProductInputResult,
+    ResponseProductDomain,
     ResultProductDomain,
 )
-from shopping_bot.core.domains.utils import to_product_domain
+from shopping_bot.core.domains.utils import product_record_to_domain, to_product_domain
 from shopping_bot.core.interfaces.repotsitory.product_rpository_interface import (
     ProductRepositoryInterface,
 )
@@ -71,7 +72,7 @@ class ProductController:
             return to_product_domain(ProductInputResult.PRODUCT_CREATED, product)
 
     async def process_confirmation(
-        self, confirmed: bool, product_id: int | None, product_name: str
+        self, confirmed: bool, product_id: int | None, product_name: str | None
     ) -> ResultProductDomain:
         if confirmed:
             if product_id is None:
@@ -81,6 +82,8 @@ class ProductController:
             product = await self.repository.get_product(product_id)
             return to_product_domain(ProductInputResult.PRODUCT_FOUND, product)
 
+        if product_name is None:
+            raise ValueError()
         product = ResponseProductRecord(name=product_name)
 
         return to_product_domain(ProductInputResult.PRODUCT_CREATED, product)
@@ -92,3 +95,11 @@ class ProductController:
         response = await self.repository.create_product(product)
 
         return to_product_domain(ProductInputResult.UNIT_ACCEPTED, response)
+
+    async def process_product_from_receipt(self, name: str) -> ResponseProductDomain:
+        product = await self.repository.get_similar_product(name)
+        if product is None:
+            product = await self.repository.create_product(
+                InputProductDomain(name, None, None)
+            )
+        return product_record_to_domain(product)

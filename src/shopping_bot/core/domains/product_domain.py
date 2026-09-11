@@ -22,9 +22,9 @@ class ResultProductDomain:
 
 @dataclass
 class ResponseProductDomain:
-    id: int
+    id: int | None
     name: str
-    unit: str
+    unit: str | None
     description: str | None = None
 
 

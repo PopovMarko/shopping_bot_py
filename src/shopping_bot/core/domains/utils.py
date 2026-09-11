@@ -34,6 +34,15 @@ def to_product_domain(
     )
 
 
+def product_record_to_domain(product: ResponseProductRecord) -> ResponseProductDomain:
+    return ResponseProductDomain(
+        id=product.id,
+        name=product.name,
+        unit=product.unit,
+        description=product.description,
+    )
+
+
 def user_record_to_input_domain(user: ResponseUserRecord) -> InputUserDomain:
     return InputUserDomain(
         telegram_id=user.telegram_id, name=user.name, is_admin=user.is_admin
