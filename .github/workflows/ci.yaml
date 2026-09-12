@@ -1,0 +1,29 @@
+---
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+      - name: Lint
+        run: uv run ruff check .
+      - name: Run tests with coverage
+        run: uv run pytest --cov=shopping_bot --cov-report=term-missing --cov-report=xml
+      - name: Check coverage threshold
+        continue-on-error: true
+        run: |-
+          uv run coverage report --fail-under=85 || \
+          echo "::warning::Test coverage is below 85 percent, consider adding more tests"
