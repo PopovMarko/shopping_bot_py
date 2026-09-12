@@ -5,4 +5,5 @@ class WaitFor(StatesGroup):
     product = State()
     quantity = State()
     confirmation = State()
-    units = State()
+    unit = State()
+    receipt = State()

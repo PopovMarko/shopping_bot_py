@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from shopping_bot.core.domain import RequestUserDomain
-from shopping_bot.core.repository_dto import UserRecord
+from shopping_bot.core.domains.user_domain import InputUserDomain
+from shopping_bot.core.records.user_records import ResponseUserRecord
 from shopping_bot.db.repository.user_repository import UserRepository
 
 
@@ -33,7 +33,7 @@ async def test_get_user_by_telegram_id_found(mock_async_session_factory):
         repository = UserRepository()
         res = await repository.get_user_by_telegram_id(123)
 
-    assert res == UserRecord(
+    assert res == ResponseUserRecord(
         id=1,
         telegram_id=123,
         name="Marko",
@@ -87,7 +87,7 @@ async def test_save_user(mock_async_session_factory):
     with patch(
         "shopping_bot.db.repository.user_repository.async_session_factory", factory
     ):
-        user_domain = RequestUserDomain(
+        user_domain = InputUserDomain(
             telegram_id=123,
             name="Marko",
             is_admin=False,
@@ -96,7 +96,7 @@ async def test_save_user(mock_async_session_factory):
         repository = UserRepository()
         res = await repository.save_user(user_domain)
 
-    assert res == UserRecord(
+    assert res == ResponseUserRecord(
         id=1,
         telegram_id=123,
         name="Marko",

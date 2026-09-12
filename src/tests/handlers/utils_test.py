@@ -3,11 +3,13 @@ from unittest.mock import call
 import pytest
 from aiogram.types import ReplyKeyboardMarkup
 
-from shopping_bot.core.domain import ProductInputResult
-from shopping_bot.handlers.utils import parse_product_response
+from shopping_bot.core.domains.product_domain import ProductInputResult
+from shopping_bot.core.domains.request_domain import RequestInputResult
+from shopping_bot.handlers.utils import parse_product_response, parse_request_response
 from shopping_bot.keyboards.add_product_kbd import (
     PRODUCT_CONFIRM_KBD,
 )
+from shopping_bot.keyboards.main_kbd import get_cancel_keyboard
 from shopping_bot.states.user_states import WaitFor
 
 
@@ -17,8 +19,8 @@ from shopping_bot.states.user_states import WaitFor
         (ProductInputResult.PRODUCT_FOUND),
         (ProductInputResult.PRODUCT_NOT_FOUND_NEEDS_CONFIRMATION),
         (ProductInputResult.PRODUCT_CREATED),
-        (ProductInputResult.QUANTITY_ACCEPTED),
-        (ProductInputResult.INVALID_QUANTITY),
+        (RequestInputResult.QUANTITY_ACCEPTED),
+        (RequestInputResult.INVALID_QUANTITY),
     ],
 )
 @pytest.mark.asyncio
@@ -32,7 +34,14 @@ async def test_parse_product_response(
     mock_message = mock_message_factory(mock_user)
     mock_response.result = input_result
 
-    await parse_product_response(mock_message, mock_state, mock_response)
+    if input_result in [
+        ProductInputResult.PRODUCT_FOUND,
+        ProductInputResult.PRODUCT_NOT_FOUND_NEEDS_CONFIRMATION,
+        ProductInputResult.PRODUCT_CREATED,
+    ]:
+        await parse_product_response(mock_message, mock_state, mock_response)
+    else:
+        await parse_request_response(mock_message, mock_state, mock_response)
 
     match input_result:
         case ProductInputResult.PRODUCT_FOUND:
@@ -47,24 +56,27 @@ async def test_parse_product_response(
             )
         case ProductInputResult.PRODUCT_NOT_FOUND_NEEDS_CONFIRMATION:
             mock_state.update_data.assert_awaited_once_with(
-                suggested_product_id=mock_response.suggested_product_id
+                suggested_product_id=mock_response.product_id
             )
             mock_state.set_state.assert_awaited_once_with(WaitFor.confirmation)
             mock_message.answer.assert_awaited_once_with(
-                f"You mean {mock_response.suggested_name}?",
+                f"You mean {mock_response.product_name}?",
                 reply_markup=ReplyKeyboardMarkup(
-                    keyboard=PRODUCT_CONFIRM_KBD, resize_keyboard=True
+                    keyboard=PRODUCT_CONFIRM_KBD,
+                    resize_keyboard=True,
+                    one_time_keyboard=True,
                 ),
             )
         case ProductInputResult.PRODUCT_CREATED:
-            mock_state.set_state.assert_awaited_once_with(WaitFor.units)
+            mock_state.set_state.assert_awaited_once_with(WaitFor.unit)
             mock_message.answer.assert_awaited_once_with(
                 f"Choose units for {mock_response.product_name}"
             )
-        case ProductInputResult.QUANTITY_ACCEPTED:
+        case RequestInputResult.QUANTITY_ACCEPTED:
             mock_state.set_state.assert_awaited_once_with(WaitFor.product)
             mock_message.answer.assert_awaited_once_with(
-                "Enter next product or empty message to quit"
+                "Enter next product or End to quit",
+                reply_markup=get_cancel_keyboard("Хватит"),
             )
-        case ProductInputResult.INVALID_QUANTITY:
+        case RequestInputResult.INVALID_QUANTITY:
             mock_message.answer.assert_awaited_once_with("Enter correct quantity")
