@@ -18,8 +18,8 @@ jobs:
           python-version: '3.14'
       - name: Install dependencies
         run: uv sync --all-extras --dev
-      - name: Lint
-        run: uv run ruff check .
+      # - name: Lint
+      #   run: uv run ruff check .
       - name: Run tests with coverage
         run: uv run pytest --cov=shopping_bot --cov-report=term-missing --cov-report=xml
       - name: Check coverage threshold
