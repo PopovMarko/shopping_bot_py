@@ -8,7 +8,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.strategy import FSMStrategy
-from anthropic import AsyncAnthropic, AsyncClient
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
+from anthropic import AsyncAnthropic
 from dotenv import load_dotenv
 
 from shopping_bot.core.config import Settings
@@ -31,13 +33,21 @@ settings = Settings()
 TOKEN = str(os.getenv("SHOPPING_BOT_TOKEN"))
 CLAUDE_API_KEY = str(os.getenv("SHOPPING_BOT_CLAUDE_API_KEY"))
 
+
+async def on_startup(bot: Bot) -> None:
+    await bot.set_webhook(settings.webhook_url)
+
+
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(
     FSMStrategy=FSMStrategy.GLOBAL_USER,
 )
+
+
 dp.include_router(router)
 dp.include_router(product_router)
 dp.include_router(store_router)
+dp.startup.register(on_startup)
 
 anthropic_client = AsyncAnthropic(api_key=CLAUDE_API_KEY)
 
@@ -70,9 +80,8 @@ receipt_service = ReceiptService(
 log.debug("Intialised Receipt repository and service")
 
 
-async def main():
-    await dp.start_polling(
-        bot,
+def main():
+    dp.workflow_data.update(
         user_controller=user_service,
         product_controller=product_service,
         request_controller=request_service,
@@ -80,9 +89,11 @@ async def main():
         anthropic_client=anthropic_client,
     )
 
+    app = web.Application()
+    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=" ")
+    setup_application(app, dp, bot=bot)
+    web.run_app(app, host="0.0.0.0", port=8080)
+
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        pass
+    main()
