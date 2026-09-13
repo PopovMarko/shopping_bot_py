@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     fuzzy_confirm_threshold: int = 50
     model: str = "blanc"
     max_tokens: int = 1024
+    webhook_url: str = " "
 
     model_config = SettingsConfigDict(toml_file=_CONFIG_PATH, extra="ignore")
 
