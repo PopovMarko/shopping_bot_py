@@ -1,37 +1,88 @@
+from __future__ import annotations
+
 import asyncio
+import logging
 import os
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.fsm.strategy import FSMStrategy
+from anthropic import AsyncAnthropic, AsyncClient
+from dotenv import load_dotenv
 
-# from dotenv import load_dotenv
+from shopping_bot.core.config import Settings
+from shopping_bot.core.logger import configure_logger
+from shopping_bot.db.repository.product_repository import ProductRepository
+from shopping_bot.db.repository.receipt_repository import ReceiptRepository
+from shopping_bot.db.repository.request_repository import RequestRepository
 from shopping_bot.db.repository.user_repository import UserRepository
-from shopping_bot.handlers.add_products import add_router
+from shopping_bot.handlers.add_products import product_router
 from shopping_bot.handlers.base import router
+from shopping_bot.handlers.in_store import store_router
+from shopping_bot.services.product_service import ProductController
+from shopping_bot.services.receipt_service import ReceiptService
+from shopping_bot.services.request_service import RequestService
 from shopping_bot.services.user_service import UserService
 
-# load_dotenv()
+load_dotenv()
+settings = Settings()
 
 TOKEN = str(os.getenv("SHOPPING_BOT_TOKEN"))
+CLAUDE_API_KEY = str(os.getenv("SHOPPING_BOT_CLAUDE_API_KEY"))
+
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
+dp = Dispatcher(
+    FSMStrategy=FSMStrategy.GLOBAL_USER,
+)
 dp.include_router(router)
-dp.include_router(add_router)
+dp.include_router(product_router)
+dp.include_router(store_router)
+
+anthropic_client = AsyncAnthropic(api_key=CLAUDE_API_KEY)
+
+configure_logger(settings.log_level)
+log = logging.getLogger(__name__)
+log.setLevel(level=settings.log_level)
 
 # Register User repository and User service to User handlers
-repository = UserRepository()
-service = UserService(repository)
+user_repository = UserRepository()
+user_service = UserService(user_repository)
+log.debug("initialised User repository and user service")
 
 # TODO: Register Product repository and Product service to Product handers
+product_repository = ProductRepository()
+product_service = ProductController(product_repository)
+log.debug("Initialised Product repository and service")
+
+request_repository = RequestRepository()
+request_service = RequestService(request_repository, user_service)
+log.debug("Initialised Request repository and service")
+
+receipt_repository = ReceiptRepository()
+receipt_service = ReceiptService(
+    receipt_repository,
+    user_repository,
+    anthropic_client,
+    product_service,
+    request_service,
+)
+log.debug("Intialised Receipt repository and service")
 
 
 async def main():
-    await dp.start_polling(bot, user_controller=service)
+    await dp.start_polling(
+        bot,
+        user_controller=user_service,
+        product_controller=product_service,
+        request_controller=request_service,
+        receipt_controller=receipt_service,
+        anthropic_client=anthropic_client,
+    )
 
 
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("Bot stopped")
+        pass

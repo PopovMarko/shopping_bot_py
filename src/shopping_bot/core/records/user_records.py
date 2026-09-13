@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass
-class UserRecord:
+class ResponseUserRecord:
     id: int
     telegram_id: int
     name: str

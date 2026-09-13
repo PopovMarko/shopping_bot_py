@@ -1,74 +1,101 @@
-from aiogram import F, Router
+import logging
+
+from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardMarkup
+from aiogram.types import Message
 
-from shopping_bot.core.interfaces import ProductController
+from shopping_bot.core.interfaces.service.product_controller_interface import (
+    ProductControllerInterface,
+)
+
+# TODO maybe move request_router to main?
+from shopping_bot.handlers.add_quantity import request_router
 from shopping_bot.handlers.utils import parse_product_response
-from shopping_bot.keyboards.add_product_kbd import (
-    PRODUCT_CONFIRM_KBD,
+from shopping_bot.keyboards.main_kbd import (
+    get_cancel_keyboard,
+    get_go_to_privat_inline_keyboard,
+    get_main_keyboard,
 )
 from shopping_bot.states.user_states import WaitFor
 
-add_router = Router()
+log = logging.getLogger(__name__)
+
+product_router = Router()
+product_router.include_router(request_router)
 
 
-@add_router.message(Command("добавить"))
-async def add_product(message: Message, state: FSMContext) -> None:
+@product_router.message(Command("Добавить"))
+async def add_product(message: Message, state: FSMContext, bot: Bot) -> None:
+    if message.chat.type == "group":
+        bot_info = await bot.get_me()
+        url = f"https://t.me/{bot_info.username}?start=123"
+        await message.answer(
+            "👇 перейти в личку", reply_markup=get_go_to_privat_inline_keyboard(url)
+        )
+        return
 
     await state.set_state(WaitFor.product)
-    await message.answer("Введите название продукта:")
+    await message.answer(
+        "Введите название продукта:", reply_markup=get_cancel_keyboard("Хватит")
+    )
 
 
-@add_router.message(WaitFor.product)
+@product_router.message(WaitFor.product, F.text.casefold() == "хватит")
+async def cancel_product_add(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await message.answer("Список покупок составлен", reply_markup=get_main_keyboard())
+
+
+@product_router.message(WaitFor.product)
 async def process_add_product(
-    message: Message, state: FSMContext, product_controller: ProductController
+    message: Message, state: FSMContext, product_controller: ProductControllerInterface
 ) -> None:
     if message.text is None:
-        await message.answer("Enter product's name")
+        await message.answer("Enter product name")
         return
+    await state.update_data(product_name=message.text)
     response = await product_controller.process_product(message.text)
     await parse_product_response(message, state, response)
 
 
-@add_router.message(WaitFor.confirmation, F.text.casefold().in_({"yes", "no"}))
+@product_router.message(WaitFor.confirmation, F.text.casefold().in_({"yes", "no"}))
 async def process_confirm_product(
-    message: Message, state: FSMContext, product_controller: ProductController
+    message: Message, state: FSMContext, product_controller: ProductControllerInterface
 ) -> None:
+
     confirmed = False
     if message.text == "yes":
         confirmed = True
 
     product_id = None
+    product_name = None
     if confirmed:
         product_id = await state.get_value("suggested_product_id")
         if product_id is None:
             raise ValueError("suggested_product_id is None")
-    response = await product_controller.process_confirmation(confirmed, product_id)
+    else:
+        product_name = await state.get_value("product_name")
+        if product_name is None:
+            raise ValueError("process_add_unit - product_name is None")
+    response = await product_controller.process_confirmation(
+        confirmed, product_id, product_name
+    )
+    # if response.unit is not None:
+    #     await add_product_unit(message, state, product_controller)
+    #     return
     await parse_product_response(message, state, response)
 
 
-# @add_router.message(WaitFor.confirmation)
-# async def process_confirmation_invalid(message: Message) -> None:
-#     await message.answer(
-#         "Please choose Yes or No by buttons",
-#         reply_markup=ReplyKeyboardMarkup(
-#             keyboard=PRODUCT_CONFIRM_KBD, resize_keyboard=True
-#         ),
-#     )
-
-
-@add_router.message(WaitFor.quantity)
-async def process_add_quantity(
-    message: Message, state: FSMContext, product_controller: ProductController
+@product_router.message(WaitFor.unit)
+async def add_product_unit(
+    message: Message, state: FSMContext, product_controller: ProductControllerInterface
 ) -> None:
-    product_name = await state.get_value("product_name")
-    product_id = await state.get_value("product_id")
-    if product_id is None:
-        raise ValueError("product_id it None in FSMContext")
     if message.text is None:
-        await message.answer(f"Enter quantity of {product_name}")
+        await message.answer("Enter product's unit")
         return
-    quantity = message.text
-    response = await product_controller.process_quantity(product_id, quantity)
+    product_name = await state.get_value("product_name")
+    if product_name is None:
+        raise ValueError("process_add_unit - product_name is None")
+    response = await product_controller.process_unit(message.text, product_name)
     await parse_product_response(message, state, response)

@@ -1,12 +1,13 @@
 import pytest
 
-from shopping_bot.core.domain import (
-    RequestUserDomain,
-    ResponseUserDomain,
+from shopping_bot.core.domains.user_domain import (
+    InputUserDomain,
+    ResultUserDomain,
     UserRegistrationResult,
 )
 from shopping_bot.handlers.base import start
 from shopping_bot.handlers.messages import ErrorMessage
+from shopping_bot.keyboards.main_kbd import get_main_keyboard
 
 
 @pytest.mark.asyncio
@@ -27,7 +28,10 @@ async def test_start_when_from_user_is_none(mock_message_factory, mock_user_cont
             UserRegistrationResult.REGISTER_USER_SUCCESS,
             "Welcome Marko, \nnow you are registered user",
         ),
-        (UserRegistrationResult.REGISTERED_USER, "Welcome back Marko"),
+        (
+            UserRegistrationResult.REGISTERED_USER,
+            "Welcome back Marko",
+        ),
     ],
 )
 async def test_start_when_from_user_is_new_user(
@@ -36,7 +40,7 @@ async def test_start_when_from_user_is_new_user(
 
     mock_message = mock_message_factory(from_user=mock_user)
 
-    mock_user_controller.start_cmd.return_value = ResponseUserDomain(
+    mock_user_controller.start_cmd.return_value = ResultUserDomain(
         msg=result_enum,
         id=mock_user.id,
         telegram_id=mock_user.telegram_id,
@@ -45,7 +49,9 @@ async def test_start_when_from_user_is_new_user(
 
     await start(mock_message, mock_user_controller)
 
-    mock_message.answer.assert_awaited_once_with(expected_text)
+    mock_message.answer.assert_awaited_once_with(
+        expected_text, reply_markup=get_main_keyboard()
+    )
     mock_user_controller.start_cmd.assert_awaited_once_with(
-        RequestUserDomain(mock_user.id, mock_user.first_name)
+        InputUserDomain(mock_user.id, mock_user.first_name)
     )
