@@ -15,4 +15,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8080
 
-CMD ["python", "-m", "main"]
+CMD ["python", "-m", "main.py"]
