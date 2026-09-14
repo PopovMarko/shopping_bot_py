@@ -38,7 +38,8 @@ async def on_startup(bot: Bot) -> None:
     await bot.set_webhook(settings.webhook_url)
 
 
-webhook_path = f"{settings.webhook_url}/webhook"
+webhook_path = "/webhook"
+webhook_url = f"{settings.webhook_url}{webhook_path}"
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(
     FSMStrategy=FSMStrategy.GLOBAL_USER,
