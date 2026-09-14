@@ -9,12 +9,13 @@ permissions:
   contents: read
   id-token: write  # required for OIDC token exchange with Google Cloud
 env:
-  PROJECT_ID: shopping-bot-504812
+  PROJECT_ID: shopping-bot-508412
   REGION: europe-north1
   SERVICE_NAME: shopping-bot
   ARTIFACT_REPO: shopping-bot-repository
   WORKLOAD_IDENTITY_PROVIDER: projects/44300439996/locations/global/workloadIdentityPools/shopping-bot-pool/providers/github-provider
   SERVICE_ACCOUNT: shopping-bot@shopping-bot-508412.iam.gserviceaccount.com
+  WEBHOOK_URL: https://shopping-bot-44300439996.europe-north1.run.app
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -37,9 +38,10 @@ jobs:
         run: |
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
       - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v2
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO
             }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          env_vars: WEBHOOK_URL=${{ env.WEBHOOK_URL }}
