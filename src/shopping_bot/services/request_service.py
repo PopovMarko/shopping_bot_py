@@ -1,3 +1,5 @@
+import logging
+import time
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
@@ -21,6 +23,8 @@ from shopping_bot.core.interfaces.service.user_controller_interface import (
     UserControllerInterface,
 )
 from shopping_bot.core.records.utils import RequestStatus
+
+log = logging.getLogger(__name__)
 
 
 class RequestService:
@@ -69,7 +73,9 @@ class RequestService:
     async def process_request_in_cart_and_back(
         self, request_id: int
     ) -> list[ResponseRequestDomain]:
+        t0 = time.perf_counter()
         request = await self.repository.get_request_by_id(request_id)
+        log.debug(f"get_request_by_id took: {time.perf_counter() - t0:.3f}s")
         match request.status:
             case RequestStatus.pending:
                 status = RequestStatus.in_cart
@@ -78,7 +84,9 @@ class RequestService:
             case _:
                 status = RequestStatus.cancelled
 
+        t0 = time.perf_counter()
         _ = await self.repository.update_request_status(request_id, status)
+        log.debug(f"update_request_status took: {time.perf_counter() - t0:.3f}s")
         return await self.process_request_list(
             RequestStatus.pending, RequestStatus.in_cart
         )
