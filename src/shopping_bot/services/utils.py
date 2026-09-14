@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import field_validator
+from pydantic.dataclasses import dataclass
 
 
 def parse_product_input(text: str) -> dict[str, str | None]:
@@ -65,7 +65,14 @@ class Product:
 @dataclass
 class ModelResponse:
     store: Store
-    receipt_date: datetime
+    receipt_date: datetime | None
     total_amount: Decimal
     product: list[Product]
     uploaded_by_user_id: int | None = 0
+
+    @field_validator("receipt_date", mode="before")
+    @classmethod
+    def unknown_to_none(cls, value):
+        if isinstance(value, str) and value.strip().upper() == "<UNKNOWN>":
+            return None
+        return value

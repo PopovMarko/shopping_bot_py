@@ -4,7 +4,8 @@ import logging
 from datetime import datetime
 from decimal import Decimal
 
-from anthropic import AsyncAnthropic
+import httpx2
+from anthropic import APIConnectionError, APITimeoutError, AsyncAnthropic
 from pydantic import TypeAdapter
 
 from shopping_bot.core.config import Settings
@@ -68,19 +69,27 @@ class ReceiptService:
         img_bytes_64: str,
         user_telegram_id: int,
         request_domain_list: list[ResponseRequestDomain],
-    ) -> None:
+    ) -> bool:
         settings = Settings()
         product_name_list = [r.product.name for r in request_domain_list]
         messages = messages_builder(img_bytes_64, product_name_list)
 
-        raw_model_response = await self.client.messages.create(
-            model=settings.model,
-            max_tokens=settings.max_tokens,
-            messages=messages,
-            system=system,
-            tools=tools,
-            tool_choice=tool_choice,
-        )
+        try:
+            raw_model_response = await self.client.messages.create(
+                model=settings.model,
+                max_tokens=settings.max_tokens,
+                messages=messages,
+                system=system,
+                tools=tools,
+                tool_choice=tool_choice,
+            )
+        except (
+            APITimeoutError,
+            APIConnectionError,
+            httpx2.TimeoutException,
+        ):
+            return False
+
         model_block = next(
             block for block in raw_model_response.content if block.type == "tool_use"
         )
@@ -132,6 +141,7 @@ class ReceiptService:
         log.debug(llm_model_response)
 
         await self.repository.create_receipt(llm_model_response)
+        return True
 
     async def process_empty_receipt(
         self,

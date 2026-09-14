@@ -85,7 +85,7 @@ class ReceiptModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"), nullable=True)
     uploaded_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    receipt_date: Mapped[datetime]
+    receipt_date: Mapped[datetime | None]
     image_url: Mapped[str | None]
     raw_model_response: Mapped[str | None]
     created_at: Mapped[datetime]

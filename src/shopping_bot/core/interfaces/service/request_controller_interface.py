@@ -36,7 +36,7 @@ class ReceiptControllerInterface(Protocol):
         img_bytes_64: str,
         user_telegram_id: int,
         request_domain_list: list[ResponseRequestDomain],
-    ) -> None: ...
+    ) -> bool: ...
 
     async def process_empty_receipt(
         self, user_telegram_id: int, request_domain_list: list[ResponseRequestDomain]
