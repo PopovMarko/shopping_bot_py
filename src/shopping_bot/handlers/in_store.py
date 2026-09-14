@@ -1,4 +1,5 @@
 import logging
+import time
 
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
@@ -57,9 +58,11 @@ async def request_in_cart_and_back(
     )
     await state.update_data(request_domain_list=request_domain_list)
     if isinstance(callback_query.message, Message):
+        t0 = time.perf_counter()
         await callback_query.message.edit_reply_markup(
             reply_markup=get_inline_product_list_keyboard(request_domain_list)
         )
+        log.debug(f"message.edit_reply_markup took: {time.perf_counter() - t0:.3f}s")
 
 
 @store_router.callback_query(F.data == "stop")
