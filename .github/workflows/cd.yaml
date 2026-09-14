@@ -45,3 +45,7 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO
             }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           env_vars: WEBHOOK_URL=${{ env.WEBHOOK_URL }}
+          secrets: |-
+            SHOPPING_BOT_TOKEN=SHOPPING_BOT_TOKEN:latest
+            SHOPPING_BOT_CLAUDE_API_KEY=SHOPPING_BOT_CLAUDE_API_KEY:latest
+            DATABASE_URL=DATABASE_URL:latest
