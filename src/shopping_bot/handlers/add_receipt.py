@@ -43,10 +43,14 @@ async def add_receipt_photo(
     if message.from_user is not None:
         user_telegram_id = message.from_user.id
 
-    await receipt_controller.process_receipt(
+    if await receipt_controller.process_receipt(
         img_bytes_64,
         user_telegram_id,
         request_domain_list,
+    ):
+        await state.clear()
+        await message.answer("Чек обработан", reply_markup=get_main_keyboard())
+        return
+    await message.answer(
+        "Не получилось распознать чек, попробуйте отправить фото ещё раз."
     )
-    await state.clear()
-    await message.answer("Чек обработан", reply_markup=get_main_keyboard())

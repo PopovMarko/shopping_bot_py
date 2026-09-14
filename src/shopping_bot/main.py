@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-# import asyncio
 import logging
 import os
 
+import httpx2
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -54,7 +54,10 @@ dp.startup.register(on_startup)
 
 dp.update.outer_middleware(TimingMiddleware())
 
-anthropic_client = AsyncAnthropic(api_key=CLAUDE_API_KEY)
+anthropic_client = AsyncAnthropic(
+    api_key=CLAUDE_API_KEY,
+    timeout=httpx2.Timeout(timeout=60, connect=15),
+)
 
 configure_logger(settings.log_level)
 log = logging.getLogger(__name__)
