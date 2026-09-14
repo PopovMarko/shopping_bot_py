@@ -5,10 +5,11 @@ RUN pip install --no-cache-dir uv
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --no-install-project
 
 COPY src/ ./src/
-# COPY config.toml ./
+COPY config.toml ./
+RUN uv sync --frozen --no-dev 
 
 ENV PATH="/app/.venv/bin:$PATH"
 
