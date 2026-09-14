@@ -34,16 +34,16 @@ TOKEN = str(os.getenv("SHOPPING_BOT_TOKEN"))
 CLAUDE_API_KEY = str(os.getenv("SHOPPING_BOT_CLAUDE_API_KEY"))
 
 
-async def on_startup(bot: Bot) -> None:
-    await bot.set_webhook(settings.webhook_url)
-
-
 webhook_path = "/webhook"
 webhook_url = f"{settings.webhook_url}{webhook_path}"
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(
     FSMStrategy=FSMStrategy.GLOBAL_USER,
 )
+
+
+async def on_startup(bot: Bot) -> None:
+    await bot.set_webhook(webhook_url)
 
 
 dp.include_router(router)
