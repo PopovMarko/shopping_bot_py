@@ -3,4 +3,4 @@ fuzzy_match_threshold = 85
 fuzzy_confirm_threshold = 50
 model = "claude-sonnet-4-6"
 max_tokens = 1024
-webhook_url = ""
+webhook_url = "https://hello-44300439996.europe-west1.run.app"

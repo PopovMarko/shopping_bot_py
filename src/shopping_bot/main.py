@@ -38,6 +38,7 @@ async def on_startup(bot: Bot) -> None:
     await bot.set_webhook(settings.webhook_url)
 
 
+webhook_path = f"{settings.webhook_url}/webhook"
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(
     FSMStrategy=FSMStrategy.GLOBAL_USER,
@@ -90,7 +91,7 @@ def main():
     )
 
     app = web.Application()
-    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=" ")
+    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=webhook_path)
     setup_application(app, dp, bot=bot)
     web.run_app(app, host="0.0.0.0", port=8080)
 
