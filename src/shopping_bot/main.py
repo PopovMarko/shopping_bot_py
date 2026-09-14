@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import asyncio
+# import asyncio
 import logging
 import os
 
@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 
 from shopping_bot.core.config import Settings
 from shopping_bot.core.logger import configure_logger
+from shopping_bot.core.middleware import TimingMiddleware
 from shopping_bot.db.repository.product_repository import ProductRepository
 from shopping_bot.db.repository.receipt_repository import ReceiptRepository
 from shopping_bot.db.repository.request_repository import RequestRepository
@@ -50,6 +51,8 @@ dp.include_router(router)
 dp.include_router(product_router)
 dp.include_router(store_router)
 dp.startup.register(on_startup)
+
+dp.update.outer_middleware(TimingMiddleware())
 
 anthropic_client = AsyncAnthropic(api_key=CLAUDE_API_KEY)
 

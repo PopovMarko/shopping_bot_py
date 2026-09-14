@@ -1,3 +1,6 @@
+import logging
+from datetime import datetime
+
 from shopping_bot.core.domains.user_domain import (
     InputUserDomain,
     ResultUserDomain,
@@ -7,6 +10,8 @@ from shopping_bot.core.interfaces.repotsitory.user_repository_interface import (
     UserRepositoryInterface,
 )
 
+log = logging.getLogger(__name__)
+
 
 class UserService:
     def __init__(self, repository: UserRepositoryInterface):
@@ -15,7 +20,10 @@ class UserService:
     async def start_cmd(self, user: InputUserDomain) -> ResultUserDomain:
 
         status = UserRegistrationResult.REGISTERED_USER
+        now = datetime.now()
         find_user = await self.repository.get_user_by_telegram_id(user.telegram_id)
+        log.debug(f"time of user database request: {datetime.now() - now}")
+
         if find_user is None:
             find_user = await self.repository.save_user(user)
             status = UserRegistrationResult.REGISTER_USER_SUCCESS
