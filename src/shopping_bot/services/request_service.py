@@ -87,9 +87,12 @@ class RequestService:
         t0 = time.perf_counter()
         _ = await self.repository.update_request_status(request_id, status)
         log.debug(f"update_request_status took: {time.perf_counter() - t0:.3f}s")
-        return await self.process_request_list(
+        t0 = time.perf_counter()
+        res = await self.process_request_list(
             RequestStatus.pending, RequestStatus.in_cart
         )
+        log.debug(f"process_request_list took: {time.perf_counter() - t0:.3f}s")
+        return res
 
     async def process_request_from_receipt(
         self,
