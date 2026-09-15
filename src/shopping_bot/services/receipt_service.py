@@ -124,24 +124,34 @@ class ReceiptService:
         llm_model_response.store.address = store_domain.address
 
         for p in llm_model_response.product:
-            for r in request_domain_list:
-                if r.product.name == p.name:
-                    p.id = r.id
-                    continue
-            product_from_receipt = (
-                await self.product_controller.process_product_from_receipt(p.name)
-            )
-            if product_from_receipt is None or user_response_domain.id is None:
-                raise ValueError()
-            request_domain = await self.request_controller.process_request_from_receipt(
-                product_from_receipt, user_response_domain.id, p.quantity
-            )
+            if not await self._match_and_assign_id(p, request_domain_list):
+                product_from_receipt = (
+                    await self.product_controller.process_product_from_receipt(p.name)
+                )
+                if product_from_receipt is None or user_response_domain.id is None:
+                    raise ValueError()
+                request_domain = (
+                    await self.request_controller.process_request_from_receipt(
+                        product_from_receipt, user_response_domain.id, p.quantity
+                    )
+                )
+                p.id = request_domain.id
 
-            p.id = request_domain.id
         log.debug(llm_model_response)
 
         await self.repository.create_receipt(llm_model_response)
         return True
+
+    async def _match_and_assign_id(
+        self,
+        p: Product,
+        request_domain_list: list[ResponseRequestDomain],
+    ) -> bool:
+        for r in request_domain_list:
+            if r.product.name == p.name:
+                p.id = r.id
+                return True
+        return False
 
     async def process_empty_receipt(
         self,
