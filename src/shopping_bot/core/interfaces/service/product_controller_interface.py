@@ -4,6 +4,7 @@ from shopping_bot.core.domains.product_domain import (
     ResponseProductDomain,
     ResultProductDomain,
 )
+from shopping_bot.services.utils import Product
 
 
 class ProductControllerInterface(Protocol):
@@ -16,5 +17,5 @@ class ProductControllerInterface(Protocol):
     async def process_unit(self, unit_str: str, name: str) -> ResultProductDomain: ...
 
     async def process_product_from_receipt(
-        self, name: str
+        self, product: Product
     ) -> ResponseProductDomain: ...

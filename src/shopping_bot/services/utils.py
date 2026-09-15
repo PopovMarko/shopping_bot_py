@@ -58,6 +58,7 @@ class Product:
     name: str
     price: Decimal | None
     quantity: Decimal | None
+    unit: str | None
     match_confidence: int | None
     id: int = 0  # ID of the Request !
 
