@@ -14,7 +14,7 @@ from shopping_bot.core.interfaces.repotsitory.product_rpository_interface import
     ProductRepositoryInterface,
 )
 from shopping_bot.db.repository.utils import ResponseProductRecord
-from shopping_bot.services.utils import parse_product_input
+from shopping_bot.services.utils import Product, parse_product_input
 
 log = logging.getLogger(__name__)
 
@@ -96,10 +96,14 @@ class ProductController:
 
         return to_product_domain(ProductInputResult.UNIT_ACCEPTED, response)
 
-    async def process_product_from_receipt(self, name: str) -> ResponseProductDomain:
-        product = await self.repository.get_similar_product(name)
-        if product is None:
-            product = await self.repository.create_product(
-                InputProductDomain(name, None, None)
+    async def process_product_from_receipt(
+        self, product: Product
+    ) -> ResponseProductDomain:
+        product_from_db = await self.repository.get_similar_product(product.name)
+        if product_from_db is None:
+            product_from_db = await self.repository.create_product(
+                InputProductDomain(
+                    name=product.name, unit=product.unit, description=None
+                )
             )
-        return product_record_to_domain(product)
+        return product_record_to_domain(product_from_db)

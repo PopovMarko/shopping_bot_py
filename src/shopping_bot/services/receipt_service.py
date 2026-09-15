@@ -126,7 +126,7 @@ class ReceiptService:
         for p in llm_model_response.product:
             if not await self._match_and_assign_id(p, request_domain_list):
                 product_from_receipt = (
-                    await self.product_controller.process_product_from_receipt(p.name)
+                    await self.product_controller.process_product_from_receipt(p)
                 )
                 if product_from_receipt is None or user_response_domain.id is None:
                     raise ValueError()
