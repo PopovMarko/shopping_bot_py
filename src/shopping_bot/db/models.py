@@ -24,7 +24,7 @@ class ProductModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     description: Mapped[str | None]
-    unit: Mapped[str]
+    unit: Mapped[str | None]
     requests: Mapped[list[RequestModel]] = relationship(
         "RequestModel", back_populates="product", foreign_keys="RequestModel.product_id"
     )
