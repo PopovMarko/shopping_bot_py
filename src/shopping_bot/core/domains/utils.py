@@ -89,6 +89,8 @@ def to_response_request_domain(
         requested_by_user_id=request.requested_by_user_id,
         requested_quantity=request.requested_quantity,
         requested_at=request.requested_at,
+        quantity=request.quantity,
+        price=request.price,
         status=request.status,
         product=to_response_product_domain(request.product),
         requested_by_user=to_response_user_domain(request.requested_by_user),

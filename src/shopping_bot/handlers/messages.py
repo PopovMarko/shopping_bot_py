@@ -1,5 +1,9 @@
 from enum import Enum
 
+from shopping_bot.core.domains.history_domain import (
+    LastShoppingDomain,
+    StatisticsShoppingDomain,
+)
 from shopping_bot.core.domains.request_domain import ResponseRequestDomain
 from shopping_bot.core.domains.user_domain import (
     ResultUserDomain,
@@ -32,3 +36,9 @@ def list_response_request_domain_to_string(
             f"{p.requested_by_user.name} {p.product.name} {p.requested_quantity} {p.product.unit}"
         )
     return "\n".join(res_list)
+
+
+def last_shopping_domain_to_string(last_shopping: LastShoppingDomain) -> str: ...
+
+
+def statistics_shopping_to_string(stat_shopping: StatisticsShoppingDomain) -> str: ...

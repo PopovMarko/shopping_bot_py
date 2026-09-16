@@ -16,10 +16,10 @@ from shopping_bot.core.domains.utils import (
     store_record_to_domain,
     to_response_user_domain,
 )
-from shopping_bot.core.interfaces.repotsitory.request_repository_interface import (
+from shopping_bot.core.interfaces.repository.request_repository_interface import (
     ReceiptRepositoryInterface,
 )
-from shopping_bot.core.interfaces.repotsitory.user_repository_interface import (
+from shopping_bot.core.interfaces.repository.user_repository_interface import (
     UserRepositoryInterface,
 )
 from shopping_bot.core.interfaces.service.product_controller_interface import (

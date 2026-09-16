@@ -7,3 +7,4 @@ class WaitFor(StatesGroup):
     confirmation = State()
     unit = State()
     receipt = State()
+    history_type = State()

@@ -22,6 +22,7 @@ from shopping_bot.db.repository.request_repository import RequestRepository
 from shopping_bot.db.repository.user_repository import UserRepository
 from shopping_bot.handlers.add_products import product_router
 from shopping_bot.handlers.base import router
+from shopping_bot.handlers.history import history_router
 from shopping_bot.handlers.in_store import store_router
 from shopping_bot.services.product_service import ProductController
 from shopping_bot.services.receipt_service import ReceiptService
@@ -50,6 +51,7 @@ async def on_startup(bot: Bot) -> None:
 dp.include_router(router)
 dp.include_router(product_router)
 dp.include_router(store_router)
+dp.include_router(history_router)
 dp.startup.register(on_startup)
 
 dp.update.outer_middleware(TimingMiddleware())

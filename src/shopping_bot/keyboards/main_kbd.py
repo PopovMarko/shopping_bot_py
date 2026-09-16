@@ -10,7 +10,7 @@ def get_main_keyboard() -> ReplyKeyboardMarkup:
     builder.button(text="/Добавить")
     builder.button(text="/Список")
     builder.button(text="/В магазине")
-    builder.button(text="/На рынке")
+    builder.button(text="/История")
     builder.button(text="Выйти")
     builder.adjust(2, 2, 1)
 
