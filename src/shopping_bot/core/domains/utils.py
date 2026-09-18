@@ -1,3 +1,9 @@
+from shopping_bot.core.domains.history_domain import (
+    LastShoppingDomain,
+    LastShoppingRequestDomain,
+    StatisticsRequest,
+    StatisticsShoppingDomain,
+)
 from shopping_bot.core.domains.product_domain import (
     ProductInputResult,
     ResponseProductDomain,
@@ -11,6 +17,12 @@ from shopping_bot.core.domains.request_domain import (
     ResultRequestDomain,
 )
 from shopping_bot.core.domains.user_domain import InputUserDomain, ResponseUserDomain
+from shopping_bot.core.records.history_records import (
+    LastShoppingRecord,
+    StatisticsRequestRecord,
+    StatisticsShoppingRecord,
+    lastShoppingProductRecord,
+)
 from shopping_bot.core.records.product_records import (
     ResponseProductRecord,
 )
@@ -113,3 +125,51 @@ def to_response_receipt_domain(
 
 def store_record_to_domain(store: ResponseStoreRecord) -> ResponseStoreDomain:
     return ResponseStoreDomain(id=store.id, name=store.name, address=store.address)
+
+
+def last_shopping_product_to_domain(
+    product: lastShoppingProductRecord,
+) -> LastShoppingRequestDomain:
+    return LastShoppingRequestDomain(
+        name=product.name,
+        unit=product.unit,
+        quantity=product.quantity,
+        price=product.price,
+    )
+
+
+def last_shopping_record_to_domain(shopping: LastShoppingRecord) -> LastShoppingDomain:
+    list_last_shopping_products: list[LastShoppingRequestDomain] = []
+    for lsh in shopping.products:
+        list_last_shopping_products.append(last_shopping_product_to_domain(lsh))
+
+    return LastShoppingDomain(
+        user_name=shopping.user_name,
+        last_shopping_date=shopping.shopping_date,
+        store_name=shopping.store_name,
+        products=list_last_shopping_products,
+    )
+
+
+def statistics_request_record_to_domain(
+    request: StatisticsRequestRecord,
+) -> StatisticsRequest:
+    return StatisticsRequest(
+        product_name=request.product_name,
+        product_quantity=request.product_quantity,
+        product_cost=request.product_cost,
+    )
+
+
+def statistics_shopping_record_to_domain(
+    shopping: StatisticsShoppingRecord,
+) -> StatisticsShoppingDomain:
+    list_products_groups: list[StatisticsRequest] = []
+    for r in shopping.product_groups:
+        list_products_groups.append(statistics_request_record_to_domain(r))
+
+    return StatisticsShoppingDomain(
+        shoppings_ammount=shopping.shoppings_ammount,
+        expences_ammount=shopping.expences_ammount,
+        product_groups=list_products_groups,
+    )

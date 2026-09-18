@@ -1,5 +1,12 @@
 from typing import Protocol
 
+from shopping_bot.core.records.history_records import (
+    LastShoppingRecord,
+    StatisticsShoppingRecord,
+)
+
 
 class HistoryRepositoryInterface(Protocol):
-    pass
+    async def get_last_shopping(self, user_id: int) -> LastShoppingRecord: ...
+
+    async def get_statistics_shopping(self) -> list[StatisticsShoppingRecord]: ...

@@ -4,7 +4,7 @@ from decimal import Decimal
 
 
 @dataclass
-class LastShoppingRequestDomain:
+class lastShoppingProductRecord:
     name: str
     unit: str
     quantity: Decimal
@@ -12,22 +12,22 @@ class LastShoppingRequestDomain:
 
 
 @dataclass
-class LastShoppingDomain:
+class LastShoppingRecord:
     user_name: str
-    last_shopping_date: datetime
+    shopping_date: datetime
     store_name: str
-    products: list[LastShoppingRequestDomain]
+    products: list[lastShoppingProductRecord]
 
 
 @dataclass
-class StatisticsRequest:
+class StatisticsRequestRecord:
     product_name: str
     product_quantity: Decimal
     product_cost: Decimal
 
 
 @dataclass
-class StatisticsShoppingDomain:
+class StatisticsShoppingRecord:
     shoppings_ammount: int
     expences_ammount: Decimal
-    product_groups: list[StatisticsRequest]
+    product_groups: list[StatisticsRequestRecord]
