@@ -25,14 +25,14 @@ history_router = Router()
 async def history(message: Message, state: FSMContext) -> None:
     log.debug("Button history handled")
     await state.set_state(WaitFor.history_type)
-    message.answer("Нажмите кнопку", reply_markup=get_history_keyboard())
+    await message.answer("Нажмите кнопку", reply_markup=get_history_keyboard())
     log.debug("reply_history_keyboard sent")
 
 
 @history_router.message(WaitFor.history_type, F.text == "Вернуться")
 async def return_to_main_menu(message: Message, state: FSMContext) -> None:
     await state.clear()
-    message.answer("Главное меню", reply_markup=get_main_keyboard())
+    await message.answer("Главное меню", reply_markup=get_main_keyboard())
 
 
 @history_router.message(WaitFor.history_type, F.text == "Крайний поход")
@@ -44,7 +44,7 @@ async def last_shopping(
     last_shopping = await history_controller.process_last_shopping(
         user_telegram_id=message.from_user.id
     )
-    message.answer(last_shopping_domain_to_string(last_shopping))
+    await message.answer(last_shopping_domain_to_string(last_shopping))
 
 
 @history_router.message(WaitFor.history_type, F.text == "Анализ")
@@ -52,4 +52,4 @@ async def statistics_shopping(
     message: Message, state: FSMContext, history_controller: HistoryControllerInterface
 ) -> None:
     stat_shopping = await history_controller.process_statistics_shopping()
-    message.answer(statistics_shopping_to_string(stat_shopping))
+    await message.answer(statistics_shopping_to_string(stat_shopping))
