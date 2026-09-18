@@ -23,8 +23,10 @@ history_router = Router()
 
 @history_router.message(Command("История"))
 async def history(message: Message, state: FSMContext) -> None:
+    log.debug("Button history handled")
     await state.set_state(WaitFor.history_type)
     message.answer("Нажмите кнопку", reply_markup=get_history_keyboard())
+    log.debug("reply_history_keyboard sent")
 
 
 @history_router.message(WaitFor.history_type, F.text == "Вернуться")
