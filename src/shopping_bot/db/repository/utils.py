@@ -1,3 +1,10 @@
+from datetime import datetime
+from decimal import Decimal
+
+from shopping_bot.core.records.history_records import (
+    LastShoppingRecord,
+    StatisticsRequestRecord,
+)
 from shopping_bot.core.records.product_records import ResponseProductRecord
 from shopping_bot.core.records.request_records import (
     ResponseReceiptRecord,
@@ -63,8 +70,23 @@ def receipt_model_to_record(receipt: ReceiptModel) -> ResponseReceiptRecord:
         id=receipt.id,
         store_id=receipt.store_id,
         uploaded_by_user_id=receipt.uploaded_by_user_id,
-        receipt_date=receipt.receipt_date,
+        receipt_date=receipt.receipt_date
+        if receipt.receipt_date is not None
+        else datetime.now(),
         image_url=receipt.image_url,
         raw_model_response=receipt.raw_model_response,
         created_at=receipt.created_at,
+    )
+
+
+def last_shopping_model_to_record(
+    request: RequestModel, receipt: ReceiptModel
+) -> LastShoppingRecord: ...
+
+
+def statistics_shopping_to_record(
+    product: str, total_number: Decimal, total_spent: Decimal
+) -> StatisticsRequestRecord:
+    return StatisticsRequestRecord(
+        product_name=product, product_quantity=total_number, product_cost=total_spent
     )

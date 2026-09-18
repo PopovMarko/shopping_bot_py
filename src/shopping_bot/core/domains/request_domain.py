@@ -39,6 +39,8 @@ class ResponseRequestDomain:
     requested_by_user_id: int
     requested_quantity: Decimal
     requested_at: datetime
+    quantity: Decimal | None
+    price: Decimal | None
     product: ResponseProductDomain
     requested_by_user: ResponseUserDomain
     status: RequestStatus | None = None

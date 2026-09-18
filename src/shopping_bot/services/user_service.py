@@ -6,7 +6,7 @@ from shopping_bot.core.domains.user_domain import (
     ResultUserDomain,
     UserRegistrationResult,
 )
-from shopping_bot.core.interfaces.repotsitory.user_repository_interface import (
+from shopping_bot.core.interfaces.repository.user_repository_interface import (
     UserRepositoryInterface,
 )
 

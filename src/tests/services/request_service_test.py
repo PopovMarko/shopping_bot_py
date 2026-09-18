@@ -39,6 +39,8 @@ async def test_process_quantity(
         product_id=1,
         requested_by_user_id=1,
         requested_quantity=Decimal(quantity) if quantity is not None else Decimal(0),
+        quantity=Decimal(0),
+        price=Decimal(0),
         requested_at=now,
         product=ResponseProductDomain(id=1, name="milk", unit="l", description=None),
         requested_by_user=ResponseUserDomain(

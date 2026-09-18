@@ -16,7 +16,7 @@ from shopping_bot.core.domains.utils import (
     to_request_domain,
     to_response_request_domain,
 )
-from shopping_bot.core.interfaces.repotsitory.request_repository_interface import (
+from shopping_bot.core.interfaces.repository.request_repository_interface import (
     RequestRepositoryInterface,
 )
 from shopping_bot.core.interfaces.service.user_controller_interface import (
