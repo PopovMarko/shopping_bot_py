@@ -23,7 +23,7 @@ class HistoryRepository:
                 .where(ReceiptModel.uploaded_by_user_id == user_id)
                 .order_by(ReceiptModel.receipt_date)
             )
-            row = res.one()
+            row = res.all()[0]
             request_model, receipt_model = row.tuple()
             return last_shopping_model_to_record(request_model, receipt_model)
 
