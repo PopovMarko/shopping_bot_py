@@ -2,6 +2,7 @@ from enum import Enum
 
 from shopping_bot.core.domains.history_domain import (
     LastShoppingDomain,
+    StatisticsRequest,
     StatisticsShoppingDomain,
 )
 from shopping_bot.core.domains.request_domain import ResponseRequestDomain
@@ -38,9 +39,27 @@ def list_response_request_domain_to_string(
     return "\n".join(res_list)
 
 
-def last_shopping_domain_to_string(last_shopping: LastShoppingDomain) -> str: ...
+def last_shopping_domain_to_string(last_shopping: LastShoppingDomain) -> str:
+    list_product_strings: list[str] = []
+    for p in last_shopping.products:
+        list_product_strings.append(
+            f"{p.name} {p.quantity} {p.price} {p.quantity * p.price}"
+        )
+    return f"{last_shopping.last_shopping_date}\n\
+            Пользователь {last_shopping.user_name}\n\
+            в магазине {last_shopping.store_name} \
+            купил:\n\
+            {'\n'.join(list_product_strings)}"
 
 
 def statistics_shopping_to_string(
-    stat_shopping: list[StatisticsShoppingDomain],
-) -> str: ...
+    stat_shopping: StatisticsShoppingDomain,
+) -> str:
+    list_product_group: list[str] = []
+    for g in stat_shopping.product_groups:
+        list_product_group.append(
+            f"{g.product_name}      {g.product_quantity} {g.product_cost}"
+        )
+    return f"За крайние 30 дней было совершено {stat_shopping.shoppings_ammount}\n\
+                покупок на сумму {stat_shopping.expences_ammount} :\n\
+            {'\n'.join(list_product_group)}"

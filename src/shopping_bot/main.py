@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from shopping_bot.core.config import Settings
 from shopping_bot.core.logger import configure_logger
 from shopping_bot.core.middleware import TimingMiddleware
+from shopping_bot.db.repository.history_repository import HistoryRepository
 from shopping_bot.db.repository.product_repository import ProductRepository
 from shopping_bot.db.repository.receipt_repository import ReceiptRepository
 from shopping_bot.db.repository.request_repository import RequestRepository
@@ -24,6 +25,7 @@ from shopping_bot.handlers.add_products import product_router
 from shopping_bot.handlers.base import router
 from shopping_bot.handlers.history import history_router
 from shopping_bot.handlers.in_store import store_router
+from shopping_bot.services.history_service import HistoryService
 from shopping_bot.services.product_service import ProductController
 from shopping_bot.services.receipt_service import ReceiptService
 from shopping_bot.services.request_service import RequestService
@@ -89,6 +91,10 @@ receipt_service = ReceiptService(
 )
 log.debug("Intialised Receipt repository and service")
 
+history_repository = HistoryRepository()
+history_service = HistoryService(history_repository, user_service)
+log.debug("Intialised History repository and service")
+
 
 def main():
     dp.workflow_data.update(
@@ -97,6 +103,7 @@ def main():
         request_controller=request_service,
         receipt_controller=receipt_service,
         anthropic_client=anthropic_client,
+        history_controller=history_service,
     )
 
     app = web.Application()

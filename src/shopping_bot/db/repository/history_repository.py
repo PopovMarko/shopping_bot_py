@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
-from operator import and_
 
 from sqlalchemy import func, select
 
 from shopping_bot.core.records.history_records import (
     LastShoppingRecord,
-    StatisticsShoppingRecord,
+    StatisticsRequestRecord,
 )
 from shopping_bot.db.models import ProductModel, ReceiptModel, RequestModel
 from shopping_bot.db.postgres.engine import async_session_factory
@@ -28,25 +27,31 @@ class HistoryRepository:
             request_model, receipt_model = row.tuple()
             return last_shopping_model_to_record(request_model, receipt_model)
 
-
-async def get_statistics_shopping(self) -> list[StatisticsShoppingRecord]:
-    from_date = datetime.today() - timedelta(days=30)
-    async with async_session_factory() as session:
-        res = await session.execute(
-            select(
-                ProductModel.id,
-                ProductModel.name,
-                func.sum(RequestModel.price * RequestModel.quantity).label(
-                    "total_spent"
-                ),
+    async def get_statistics_shopping(self) -> list[StatisticsRequestRecord]:
+        from_date = datetime.today() - timedelta(days=30)
+        async with async_session_factory() as session:
+            res = await session.execute(
+                select(
+                    ProductModel.id,
+                    ProductModel.name,
+                    func.sum(RequestModel.price * RequestModel.quantity).label(
+                        "total_spent"
+                    ),
+                    func.sum(RequestModel.quantity).label(
+                        "total_number",
+                    ),
+                )
+                .join(RequestModel.product)
+                .join(ReceiptModel, ReceiptModel.id == RequestModel.receipt_id)
+                .where(ReceiptModel.receipt_date >= from_date)
+                .group_by(ProductModel.id, ProductModel.name)
             )
-            .join(RequestModel.product)
-            .join(ReceiptModel, ReceiptModel.id == RequestModel.receipt_id)
-            .where(ReceiptModel.receipt_date >= from_date)
-            .group_by(ProductModel.id, ProductModel.name)
-        )
-        rows = res.all()
-        return [
-            statistics_shopping_to_record(product_name, total_spent)
-            for product_id, product_name, total_spent in rows
-        ]
+            rows = res.all()
+            return [
+                statistics_shopping_to_record(
+                    product_name,
+                    total_spent,
+                    total_number,
+                )
+                for product_name, total_spent, total_number in rows
+            ]

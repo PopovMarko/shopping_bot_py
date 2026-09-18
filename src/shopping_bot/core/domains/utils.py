@@ -162,14 +162,10 @@ def statistics_request_record_to_domain(
 
 
 def statistics_shopping_record_to_domain(
-    shopping: StatisticsShoppingRecord,
-) -> StatisticsShoppingDomain:
+    shopping: list[StatisticsRequestRecord],
+) -> list[StatisticsRequest]:
     list_products_groups: list[StatisticsRequest] = []
-    for r in shopping.product_groups:
+    for r in shopping:
         list_products_groups.append(statistics_request_record_to_domain(r))
 
-    return StatisticsShoppingDomain(
-        shoppings_ammount=shopping.shoppings_ammount,
-        expences_ammount=shopping.expences_ammount,
-        product_groups=list_products_groups,
-    )
+    return list_products_groups

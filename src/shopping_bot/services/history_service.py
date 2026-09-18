@@ -4,11 +4,11 @@ import logging
 
 from shopping_bot.core.domains.history_domain import (
     LastShoppingDomain,
-    StatisticsShoppingDomain,
+    StatisticsRequest,
 )
 from shopping_bot.core.domains.utils import (
     last_shopping_record_to_domain,
-    statistics_shopping_record_to_domain,
+    statistics_request_record_to_domain,
 )
 from shopping_bot.core.interfaces.repository.history_repository import (
     HistoryRepositoryInterface,
@@ -38,8 +38,8 @@ class HistoryService:
         last_shopping_record = await self.repository.get_last_shopping(user_id)
         return last_shopping_record_to_domain(last_shopping_record)
 
-    async def process_statistics_shopping(self) -> list[StatisticsShoppingDomain]:
+    async def process_statistics_shopping(self) -> list[StatisticsRequest]:
         stat_shopping = await self.repository.get_statistics_shopping()
         return [
-            statistics_shopping_record_to_domain(shopping) for shopping in stat_shopping
+            statistics_request_record_to_domain(shopping) for shopping in stat_shopping
         ]
