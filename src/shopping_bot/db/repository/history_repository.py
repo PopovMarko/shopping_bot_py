@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import NoResultFound
 
 from shopping_bot.core.records.history_records import (
     LastShoppingRecord,
@@ -44,14 +45,18 @@ class HistoryRepository:
                 .join(RequestModel.product)
                 .join(ReceiptModel, ReceiptModel.id == RequestModel.receipt_id)
                 .where(ReceiptModel.receipt_date >= from_date)
-                .group_by(ProductModel.id, ProductModel.name)
+                .group_by(ProductModel.id, ProductModel.name.desc())
+                .limit(1)
             )
-            rows = res.all()
+            row = res.first()
+            if row is None:
+                raise NoResultFound("No shopping history for")
+
             return [
                 statistics_shopping_to_record(
                     product_name,
                     total_spent,
                     total_number,
                 )
-                for product_id, product_name, total_spent, total_number in rows
+                for product_id, product_name, total_spent, total_number in row
             ]
