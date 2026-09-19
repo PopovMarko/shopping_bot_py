@@ -53,5 +53,5 @@ class HistoryRepository:
                     total_spent,
                     total_number,
                 )
-                for product_name, total_spent, total_number in rows
+                for product_id, product_name, total_spent, total_number in rows
             ]
