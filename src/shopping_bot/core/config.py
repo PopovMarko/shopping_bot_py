@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     model: str = "blanc"
     max_tokens: int = 1024
     webhook_url: str = " "
+    similarity: float = 0.3
 
     model_config = SettingsConfigDict(toml_file=_CONFIG_PATH, extra="ignore")
 

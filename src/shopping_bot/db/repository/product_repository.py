@@ -2,11 +2,14 @@ from dataclasses import asdict
 
 from sqlalchemy import func, insert, select, text
 
+from shopping_bot.core.config import Settings
 from shopping_bot.core.domains.product_domain import InputProductDomain
 from shopping_bot.core.records.product_records import ResponseProductRecord
 from shopping_bot.db.models import ProductModel
 from shopping_bot.db.postgres.engine import async_session_factory
 from shopping_bot.db.repository.utils import product_model_to_record
+
+settings = Settings()
 
 
 class ProductRepository:
@@ -49,7 +52,9 @@ class ProductRepository:
 
     async def get_similar_product(self, name: str) -> ResponseProductRecord | None:
         async with async_session_factory() as session:
-            await session.execute(text("SET LOCAL pg_trgm.similarity_threshold = 0.5;"))
+            await session.execute(
+                text(f"SET LOCAL pg_trgm.similarity_threshold = {settings.similarity};")
+            )
 
             res = await session.execute(
                 select(ProductModel)

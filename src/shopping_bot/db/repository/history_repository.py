@@ -18,7 +18,6 @@ from shopping_bot.db.models import (
 )
 from shopping_bot.db.postgres.engine import async_session_factory
 from shopping_bot.db.repository.utils import (
-    last_shopping_model_to_record,
     statistics_shopping_to_record,
 )
 
