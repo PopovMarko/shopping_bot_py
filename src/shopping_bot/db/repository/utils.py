@@ -81,7 +81,13 @@ def receipt_model_to_record(receipt: ReceiptModel) -> ResponseReceiptRecord:
 
 def last_shopping_model_to_record(
     request: RequestModel, receipt: ReceiptModel
-) -> LastShoppingRecord: ...
+) -> LastShoppingRecord:
+    return LastShoppingRecord(
+        user_name=receipt.uploaded_by_user_id,
+        shopping_date=receipt.receipt_date,
+        store_name=receipt.store_id,
+        products=request,
+    )
 
 
 def statistics_shopping_to_record(

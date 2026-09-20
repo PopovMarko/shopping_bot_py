@@ -53,13 +53,16 @@ def last_shopping_domain_to_string(last_shopping: LastShoppingDomain) -> str:
 
 
 def statistics_shopping_to_string(
-    stat_shopping: StatisticsShoppingDomain,
+    stat_shopping: list[StatisticsRequest],
 ) -> str:
     list_product_group: list[str] = []
-    for g in stat_shopping.product_groups:
+    total_cost = 0
+    total_product = len(stat_shopping)
+    for g in stat_shopping:
         list_product_group.append(
-            f"{g.product_name}      {g.product_quantity} {g.product_cost}"
+            f"{g.product_name.split(' ')[0]}\t\t{g.product_cost}\t{g.product_quantity: .2f}"
         )
-    return f"За крайние 30 дней было совершено {stat_shopping.shoppings_ammount}\n\
-                покупок на сумму {stat_shopping.expences_ammount} :\n\
+        total_cost += g.product_quantity
+    return f"За крайние 30 дней было совершено {total_product}\n\
+            покупок на сумму {total_cost: .2f} :\n\n\
             {'\n'.join(list_product_group)}"

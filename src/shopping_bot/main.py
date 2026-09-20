@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 
@@ -54,7 +55,6 @@ dp.include_router(router)
 dp.include_router(product_router)
 dp.include_router(store_router)
 dp.include_router(history_router)
-dp.startup.register(on_startup)
 
 dp.update.outer_middleware(TimingMiddleware())
 
@@ -105,7 +105,11 @@ def main():
         anthropic_client=anthropic_client,
         history_controller=history_service,
     )
+    if os.getenv("RUN_MODE", "webhook") == "polling":
+        asyncio.run(dp.start_polling(bot))
+        return
 
+    dp.startup.register(on_startup)
     app = web.Application()
     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=webhook_path)
     setup_application(app, dp, bot=bot)
