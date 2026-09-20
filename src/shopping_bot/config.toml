@@ -1,6 +1,7 @@
-log_level = "DEBUG"
+log_level = "WARNING"
 fuzzy_match_threshold = 85
 fuzzy_confirm_threshold = 50
 model = "claude-sonnet-4-6"
 max_tokens = 1024
 webhook_url = "https://shopping-bot-44300439996.europe-north1.run.app"
+similarity = 0.3
