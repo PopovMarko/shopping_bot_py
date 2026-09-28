@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from datetime import date
 from typing import cast
 
 from anthropic.types import MessageParam, ToolChoiceParam, ToolUnionParam
@@ -35,6 +36,7 @@ def prompt_builder(product_name_list: list[str]):
     def f_string() -> str:
         product_list_text = "\n".join(f"- {name}" for name in product_name_list)
         prompt = f"""
+        Today is {date.today().isoformat()}. The receipt date can not be later than today.
         List of products currently in the cart (use them as a reference for the "name" field):
         {product_list_text}
         Parse the receipt in the photo and fill in the extract_receipt structure.
@@ -68,7 +70,14 @@ tools: Iterable[ToolUnionParam] = [
                     },
                     "required": [],
                 },
-                "receipt_date": {"type": "string"},
+                "receipt_date": {
+                    "type": "string",
+                    "description": """
+                        Date and time of the purchase printed on the receipt in ISO format
+                        YYYY-MM-DDTHH:MM:SS. Receipts usually print the date as DD.MM.YYYY or
+                        DD.MM.YY (day first). If the time is not printed use YYYY-MM-DD.
+                        If the date is not readable return <UNKNOWN>""",
+                },
                 "total_amount": {"type": "string"},
                 "product": {
                     "type": "array",
@@ -124,7 +133,8 @@ system = """
   item, estimate your confidence in the correctness of the name match as a percentage from zero to a hundred, and put this value in the
   match_confidence field. If the name on the receipt is illegible or damaged, provide the most likely value and lower the confidence 
   accordingly.  Take the store name from the receipt header; if there is no explicit chain name, use the owner's last name if it is present.
-  Provide the address in the format of city and street, without extra details. Convert the receipt date to a unified year-month-day format.
+  Provide the address in the format of city and street, without extra details. Convert the receipt date and time to ISO format
+  YYYY-MM-DDTHH:MM:SS, keeping the time printed on the receipt.
   All numeric values, such as price, quantity, and total amount, must be formatted as a string suitable for direct conversion to a number:
       use a period as the decimal separator, no spaces, no thousands separators, and no currency symbols. This rule applies equally 
       to monetary amounts and to quantities, including fractional values, e.g. convert "0,5 kg" to "0.5". For example, if the receipt

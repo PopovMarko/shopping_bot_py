@@ -74,6 +74,24 @@ class ModelResponse:
     @field_validator("receipt_date", mode="before")
     @classmethod
     def unknown_to_none(cls, value):
-        if isinstance(value, str) and value.strip().upper() == "<UNKNOWN>":
+        if not isinstance(value, str):
+            return value
+        value = value.strip()
+        try:
+            return datetime.fromisoformat(value)
+        except ValueError:
+            pass
+        for fmt in ("%d.%m.%Y %H:%M:%S", "%d.%m.%Y %H:%M", "%d.%m.%Y", "%d.%m.%y"):
+            try:
+                return datetime.strptime(value, fmt)
+            except ValueError:
+                pass
+        return None
+
+    @field_validator("receipt_date", mode="after")
+    @classmethod
+    def future_to_none(cls, value: datetime | None) -> datetime | None:
+        # misrecognized date (e.g. swapped day and month) must not become "last shopping"
+        if value is not None and value.date() > datetime.now().date():
             return None
         return value
