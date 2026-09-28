@@ -59,3 +59,15 @@ async def test_start_cmd_user_exists_and_not_exists(
         mock_repository.save_user.assert_not_awaited()
 
     assert res == expected
+
+
+@pytest.mark.parametrize("user_record, expected", [(user, 1), (None, None)])
+@pytest.mark.asyncio
+async def test_get_user_id_by_telegram_id(
+    mock_user_repository_factory, user_record, expected
+):
+    mock_repository = mock_user_repository_factory(user, user_record)
+
+    res = await UserService(mock_repository).get_user_id_by_telegram_id(123)
+
+    assert res == expected
