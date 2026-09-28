@@ -109,10 +109,13 @@ async def test_get_statistics_shopping(mock_async_session_factory):
     with patch(FACTORY_PATH, factory):
         res = await HistoryRepository().get_statistics_shopping()
 
+    sql = str(session.execute.await_args.args[0])
+    assert "coalesce(sum(requests.price * requests.quantity)" in sql
+    assert "ORDER BY total_spent DESC" in sql
     assert res == [
         StatisticsRequestRecord(
             product_name="milk",
-            product_quantity=Decimal("3.00"),
-            product_cost=Decimal(2),
+            product_quantity=Decimal(2),
+            product_cost=Decimal("3.00"),
         )
     ]

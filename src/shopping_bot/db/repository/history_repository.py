@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.exc import NoResultFound
 
 from shopping_bot.core.records.history_records import (
@@ -79,28 +79,28 @@ class HistoryRepository:
                 select(
                     ProductModel.id,
                     ProductModel.name,
-                    func.sum(RequestModel.price * RequestModel.quantity).label(
-                        "total_spent"
-                    ),
-                    func.sum(RequestModel.quantity).label(
-                        "total_number",
+                    # requests closed without receipt have no price and quantity
+                    func.coalesce(
+                        func.sum(RequestModel.price * RequestModel.quantity), 0
+                    ).label("total_spent"),
+                    func.coalesce(func.sum(RequestModel.quantity), 0).label(
+                        "total_number"
                     ),
                 )
                 .join(RequestModel.product)
                 .join(ReceiptModel, ReceiptModel.id == RequestModel.receipt_id)
                 .where(ReceiptModel.receipt_date >= from_date)
                 .group_by(ProductModel.id, ProductModel.name)
+                .order_by(text("total_spent DESC"))
             )
             row = res.all()
             log.debug(row)
-            if row is None:
-                raise NoResultFound("No shopping history for")
 
             return [
                 statistics_shopping_to_record(
-                    product_name,
-                    total_spent,
-                    total_number,
+                    product=product_name,
+                    total_number=total_number,
+                    total_spent=total_spent,
                 )
                 for product_id, product_name, total_spent, total_number in row
             ]

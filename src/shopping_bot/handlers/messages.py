@@ -1,3 +1,4 @@
+from decimal import Decimal
 from enum import Enum
 
 from shopping_bot.core.domains.history_domain import (
@@ -39,30 +40,47 @@ def list_response_request_domain_to_string(
     return "\n".join(res_list)
 
 
+def _format_quantity(quantity: Decimal) -> str:
+    return f"{quantity:.3f}".rstrip("0").rstrip(".")
+
+
 def last_shopping_domain_to_string(last_shopping: LastShoppingDomain) -> str:
     list_product_strings: list[str] = []
+    total_cost = Decimal(0)
     for p in last_shopping.products:
+        # products closed without receipt have no price and quantity
+        if p.quantity is None or p.price is None:
+            list_product_strings.append(p.name)
+            continue
+        cost = p.quantity * p.price
+        total_cost += cost
         list_product_strings.append(
-            f"{p.name} {p.quantity} {p.price} {p.quantity * p.price}"
+            f"{p.name} {_format_quantity(p.quantity)} {p.unit} x {p.price} = {cost:.2f}"
         )
-    return f"{last_shopping.last_shopping_date}\n\
-            Пользователь {last_shopping.user_name}\n\
-            в магазине {last_shopping.store_name} \
-            купил:\n\
-            {'\n'.join(list_product_strings)}"
+    shopping_date = last_shopping.last_shopping_date
+    header = [
+        f"{shopping_date:%d.%m.%Y %H:%M}" if shopping_date else "Дата неизвестна",
+        f"Пользователь {last_shopping.user_name}",
+        f"в магазине {last_shopping.store_name} купил:",
+    ]
+    return "\n".join([*header, *list_product_strings, f"Итого: {total_cost:.2f}"])
 
 
 def statistics_shopping_to_string(
     stat_shopping: list[StatisticsRequest],
 ) -> str:
+    if not stat_shopping:
+        return "За последние 30 дней покупок нет"
     list_product_group: list[str] = []
-    total_cost = 0
-    total_product = len(stat_shopping)
+    total_cost = Decimal(0)
     for g in stat_shopping:
+        quantity = _format_quantity(g.product_quantity)
         list_product_group.append(
-            f"{g.product_name.split(' ')[0]}\t\t{g.product_cost}\t{g.product_quantity: .2f}"
+            f"{g.product_name}: {g.product_cost:.2f} ({quantity})"
         )
-        total_cost += g.product_quantity
-    return f"За крайние 30 дней было совершено {total_product}\n\
-            покупок на сумму {total_cost: .2f} :\n\n\
-            {'\n'.join(list_product_group)}"
+        total_cost += g.product_cost
+    header = (
+        f"За последние 30 дней куплено товаров: {len(stat_shopping)}\n"
+        f"на сумму {total_cost:.2f}:\n"
+    )
+    return header + "\n".join(list_product_group)

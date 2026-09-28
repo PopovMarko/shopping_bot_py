@@ -7,14 +7,14 @@ from decimal import Decimal
 class lastShoppingProductRecord:
     name: str
     unit: str
-    quantity: Decimal
-    price: Decimal
+    quantity: Decimal | None
+    price: Decimal | None
 
 
 @dataclass
 class LastShoppingRecord:
     user_name: str
-    shopping_date: datetime
+    shopping_date: datetime | None
     store_name: str
     products: list[lastShoppingProductRecord]
 
