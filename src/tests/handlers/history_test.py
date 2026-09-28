@@ -75,10 +75,10 @@ async def test_last_shopping(
         user_telegram_id=mock_user.id
     )
     text = message.answer.await_args.args[0]
-    assert "2026-09-28 14:35:00" in text
+    assert "28.09.2026 14:35" in text
     assert "Marko" in text
     assert "Lidl" in text
-    assert "milk 2 1.50 3.00" in text
+    assert "milk 2 l x 1.50 = 3.00" in text
 
 
 @pytest.mark.asyncio
