@@ -110,6 +110,8 @@ class ReceiptService:
             raise ValueError("user is None in process_receipt")
         user_response_domain = to_response_user_domain(user_record)
         llm_model_response.uploaded_by_user_id = user_response_domain.id
+        if llm_model_response.receipt_date is None:
+            llm_model_response.receipt_date = datetime.now()
 
         store_record = await self.repository.get_store_by_name_and_address(
             llm_model_response.store.name, llm_model_response.store.address

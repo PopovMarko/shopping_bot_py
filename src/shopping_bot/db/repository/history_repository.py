@@ -30,7 +30,11 @@ class HistoryRepository:
             latest_receipt_id = (
                 select(ReceiptModel.id)
                 .where(ReceiptModel.uploaded_by_user_id == user_id)
-                .order_by(ReceiptModel.receipt_date.desc().nullslast())
+                .order_by(
+                    func.date(ReceiptModel.receipt_date).desc().nullslast(),
+                    ReceiptModel.created_at.desc(),
+                    ReceiptModel.id.desc(),
+                )
                 .limit(1)
                 .scalar_subquery()
             )
