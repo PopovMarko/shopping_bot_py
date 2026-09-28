@@ -7,6 +7,7 @@ from decimal import Decimal
 import httpx2
 from anthropic import APIConnectionError, APITimeoutError, AsyncAnthropic
 from pydantic import TypeAdapter
+from rapidfuzz import fuzz, process, utils
 
 from shopping_bot.core.config import Settings
 from shopping_bot.core.domains.request_domain import (
@@ -125,35 +126,73 @@ class ReceiptService:
         llm_model_response.store.name = store_domain.name
         llm_model_response.store.address = store_domain.address
 
+        # each cart request can be matched with one receipt line only
+        unmatched_requests = list(request_domain_list)
         for p in llm_model_response.product:
-            if not await self._match_and_assign_id(p, request_domain_list):
+            request = self._match_request_by_name(
+                p.name, unmatched_requests, settings.fuzzy_match_threshold
+            )
+            if request is None:
                 product_from_receipt = (
                     await self.product_controller.process_product_from_receipt(p)
                 )
                 if product_from_receipt is None or user_response_domain.id is None:
                     raise ValueError()
+                request = next(
+                    (
+                        r
+                        for r in unmatched_requests
+                        if r.product_id == product_from_receipt.id
+                    ),
+                    None,
+                )
+            if request is None:
                 request_domain = (
                     await self.request_controller.process_request_from_receipt(
                         product_from_receipt, user_response_domain.id, p.quantity
                     )
                 )
                 p.id = request_domain.id
+                continue
+            unmatched_requests.remove(request)
+            p.id = request.id
+
+        # cart products not recognised on the receipt were bought too,
+        # close them so they don't stay in the list for the next shopping
+        for r in unmatched_requests:
+            log.warning(f"request {r.id} {r.product.name} not found on receipt")
+            llm_model_response.product.append(
+                Product(
+                    id=r.id,
+                    name=r.product.name,
+                    price=None,
+                    quantity=r.quantity,
+                    unit=r.product.unit,
+                    match_confidence=None,
+                )
+            )
 
         log.debug(llm_model_response)
 
         await self.repository.create_receipt(llm_model_response)
         return True
 
-    async def _match_and_assign_id(
+    def _match_request_by_name(
         self,
-        p: Product,
+        name: str,
         request_domain_list: list[ResponseRequestDomain],
-    ) -> bool:
-        for r in request_domain_list:
-            if r.product.name == p.name:
-                p.id = r.id
-                return True
-        return False
+        threshold: int,
+    ) -> ResponseRequestDomain | None:
+        match = process.extractOne(
+            name,
+            [r.product.name for r in request_domain_list],
+            scorer=fuzz.token_set_ratio,
+            processor=utils.default_process,
+            score_cutoff=threshold,
+        )
+        if match is None:
+            return None
+        return request_domain_list[match[2]]
 
     async def process_empty_receipt(
         self,
@@ -173,6 +212,7 @@ class ReceiptService:
                 name=r.product.name,
                 price=None,
                 quantity=None,
+                unit=r.product.unit,
                 match_confidence=None,
             )
             for r in request_domain_list
